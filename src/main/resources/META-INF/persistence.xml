@@ -1,0 +1,42 @@
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+
+    <persistence-unit name="hibernate.jpa">
+        <description>
+            Persistence unit utilizing Hibernate via JPA 2.2
+        </description>
+
+        <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://10.20.16.7:5432/postgres"/>
+            <property name="javax.persistence.jdbc.user" value="postgres"/>
+            <property name="javax.persistence.jdbc.password" value="123456"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL10Dialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.default_cache_concurrency_strategy" value="read-write"/>
+            <property name="hibernate.cache.region.factory_class" value="infinispan"/>
+            <property name="hibernate.cache.infinispan.cfg"
+                      value="org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml"/>
+
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.connection.C3P0ConnectionProvider"/>
+            <property name="hibernate.c3p0.autoReconnect" value="true"/>
+        </properties>
+
+    </persistence-unit>
+
+</persistence>
