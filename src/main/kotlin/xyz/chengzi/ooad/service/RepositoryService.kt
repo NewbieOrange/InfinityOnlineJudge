@@ -15,7 +15,7 @@ class RepositoryService(persistenceUnitName: String) {
     val submissionRepository = JpaRepository<Submission>(entityManagerFactory, Submission::class.java)
     val userRepository = UserRepository(entityManagerFactory)
 
-    fun stop() {
+    fun close() {
         entityManagerFactory.close()
     }
 }

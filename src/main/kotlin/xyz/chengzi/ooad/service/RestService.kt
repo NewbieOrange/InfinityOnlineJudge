@@ -28,7 +28,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
         app.start(port)
     }
 
-    fun stop() {
+    fun close() {
         app.stop()
     }
 }
