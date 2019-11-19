@@ -27,6 +27,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 post(submissionController::create)
             }
             path("users") {
+                get(userController::listAll)
                 post(userController::create)
             }
             path("user") {
