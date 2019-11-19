@@ -14,11 +14,6 @@ public class UsernameSpecification implements JpqlSpecification<User> {
         this.username = username;
     }
 
-    @Override
-    public boolean isSatisfiedBy(@Nonnull User user) {
-        return username.equals(user.getUsername());
-    }
-
     @Nonnull
     @Override
     public String toJpqlQuery() {
