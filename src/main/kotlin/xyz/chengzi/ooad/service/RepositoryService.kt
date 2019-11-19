@@ -3,9 +3,8 @@ package xyz.chengzi.ooad.service
 import xyz.chengzi.ooad.entity.Contest
 import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.entity.Submission
-import xyz.chengzi.ooad.entity.User
 import xyz.chengzi.ooad.repository.JpaRepository
-import xyz.chengzi.ooad.repository.UserRepository
+import xyz.chengzi.ooad.repository.user.UserRepository
 import javax.persistence.Persistence
 
 class RepositoryService(persistenceUnitName: String) {
