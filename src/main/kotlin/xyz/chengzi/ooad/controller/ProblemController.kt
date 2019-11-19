@@ -23,4 +23,9 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         val items = repositoryService.problemRepository.findAll(SinceIdSpecification(since, 10))
         ctx.json(items)
     }
+
+    fun getById(ctx: Context) {
+        val item = repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
+        ctx.json(item)
+    }
 }

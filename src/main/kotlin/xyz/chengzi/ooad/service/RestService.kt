@@ -21,6 +21,9 @@ class RestService(server: ApplicationServer, private val port: Int) {
             path("problems") {
                 get(problemController::listAll)
                 post(problemController::create)
+                path(":id") {
+                    get(problemController::getById)
+                }
             }
             path("submissions") {
                 get(submissionController::listAll)
