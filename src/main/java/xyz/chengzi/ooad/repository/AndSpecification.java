@@ -1,10 +1,7 @@
 package xyz.chengzi.ooad.repository;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AndSpecification<T> implements JpqlSpecification<T> {
     private List<Specification<T>> specifications = new ArrayList<>();
@@ -19,16 +16,6 @@ public class AndSpecification<T> implements JpqlSpecification<T> {
     public AndSpecification<T> add(@Nonnull Specification<T> specification) {
         specifications.add(specification);
         return this;
-    }
-
-    @Override
-    public boolean isSatisfiedBy(@Nonnull T t) {
-        for (Specification<T> specification : specifications) {
-            if (!specification.isSatisfiedBy(t)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Nonnull
@@ -49,5 +36,11 @@ public class AndSpecification<T> implements JpqlSpecification<T> {
             parameters.putAll(((JpqlSpecification<T>) specification).getJpqlParameters());
         }
         return parameters;
+    }
+
+    @Override
+    public int getMaxResults() {
+        return specifications.stream().min(Comparator.comparingInt(Specification::getMaxResults))
+                .map(Specification::getMaxResults).orElse(Integer.MAX_VALUE);
     }
 }

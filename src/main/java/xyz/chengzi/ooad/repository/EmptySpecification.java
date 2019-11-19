@@ -6,11 +6,6 @@ import java.util.Map;
 
 public class EmptySpecification<T> implements JpqlSpecification<T>
 {
-    @Override public boolean isSatisfiedBy(@Nonnull T t)
-    {
-        return true;
-    }
-
     @Nonnull
     @Override public String toJpqlQuery()
     {

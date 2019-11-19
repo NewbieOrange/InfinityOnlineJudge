@@ -4,10 +4,11 @@ import javax.annotation.Nonnull;
 
 public interface Specification<T> {
     /**
-     * Check if the given object is satisfied by this specification.
+     * Return the maximum amount of results queried by this Specification.
      *
-     * @param t the object.
-     * @return whether it is satisfied by this specification.
+     * @return the max amount of results.
      */
-    boolean isSatisfiedBy(@Nonnull T t);
+    default int getMaxResults() {
+        return -1;
+    }
 }
