@@ -1,9 +1,8 @@
-package xyz.chengzi.ooad.repository
+package xyz.chengzi.ooad.repository.user
 
 import xyz.chengzi.ooad.entity.User
-import xyz.chengzi.ooad.repository.user.UsernameSpecification
+import xyz.chengzi.ooad.repository.JpaRepository
 import javax.persistence.EntityManagerFactory
-import javax.persistence.EntityNotFoundException
 
 class UserRepository(entityManagerFactory: EntityManagerFactory) : JpaRepository<User>(entityManagerFactory, User::class.java) {
     fun findByUsername(username: String): User {
