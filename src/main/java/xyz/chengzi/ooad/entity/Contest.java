@@ -1,5 +1,6 @@
 package xyz.chengzi.ooad.entity;
 
+import xyz.chengzi.ooad.embeddable.ContestProblem;
 import xyz.chengzi.ooad.embeddable.ContestStatus;
 
 import javax.persistence.*;
@@ -14,8 +15,8 @@ public class Contest {
     private Integer id;
     private String title;
     private String description;
-    @OneToMany
-    private List<Problem> problems;
+    @ElementCollection
+    private List<ContestProblem> problems;
     private Date startDate, endDate;
     private ContestStatus status;
 
@@ -39,7 +40,7 @@ public class Contest {
         this.description = description;
     }
 
-    public List<Problem> getProblems() {
+    public List<ContestProblem> getProblems() {
         return problems;
     }
 

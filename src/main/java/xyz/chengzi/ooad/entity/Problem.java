@@ -11,6 +11,8 @@ public class Problem {
     private String title;
     private String description;
     private String descriptionHtml;
+    private Integer timeLimit;
+    private Integer memoryLimit;
     private Integer acceptedAmount;
     private Integer submissionAmount;
 
@@ -40,6 +42,22 @@ public class Problem {
 
     public void setDescriptionHtml(String descriptionHtml) {
         this.descriptionHtml = descriptionHtml;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public Integer getMemoryLimit() {
+        return memoryLimit;
+    }
+
+    public void setMemoryLimit(Integer memoryLimit) {
+        this.memoryLimit = memoryLimit;
     }
 
     public Integer getAcceptedAmount() {

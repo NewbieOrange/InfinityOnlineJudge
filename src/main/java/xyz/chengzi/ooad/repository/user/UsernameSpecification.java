@@ -23,6 +23,6 @@ public class UsernameSpecification implements JpqlSpecification<User> {
     @Nonnull
     @Override
     public Map<String, Object> getJpqlParameters() {
-        return new ImmutableMap.Builder<String, Object>().put("username" + hashCode(), username).build();
+        return ImmutableMap.of("username" + hashCode(), username);
     }
 }

@@ -15,7 +15,6 @@ public class Submission {
     private Problem problem;
     @OneToOne
     private User user;
-    private String codeContent;
     private SubmissionStatus status;
     private Integer timeUsage;
     private Integer memoryUsage;
@@ -41,14 +40,6 @@ public class Submission {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getCodeContent() {
-        return codeContent;
-    }
-
-    public void setCodeContent(String codeContent) {
-        this.codeContent = codeContent;
     }
 
     public SubmissionStatus getStatus() {

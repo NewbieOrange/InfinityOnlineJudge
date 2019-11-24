@@ -9,16 +9,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public interface Repository<T> extends AutoCloseable
-{
+public interface Repository<T> extends AutoCloseable {
     /**
      * Add the given item to the repository.
      *
      * @param item the item.
      * @throws EntityAlreadyExistsException the object already exists (or one with the same unique fields).
      */
-    default void add(@Nonnull T item)
-    {
+    default void add(@Nonnull T item) {
         addAll(Collections.singleton(item));
     }
 
@@ -27,8 +25,7 @@ public interface Repository<T> extends AutoCloseable
      *
      * @param item the item.
      */
-    default void remove(@Nonnull T item)
-    {
+    default void remove(@Nonnull T item) {
         removeAll(Collections.singleton(item));
     }
 
@@ -52,11 +49,9 @@ public interface Repository<T> extends AutoCloseable
      * @throws EntityNotFoundException If no item with the given specification can be found.
      */
     @Nonnull
-    default T find(@Nonnull Specification<T> specification) throws EntityNotFoundException
-    {
+    default T find(@Nonnull Specification<T> specification) throws EntityNotFoundException {
         Iterator<T> iterator = findAll(specification).iterator();
-        if (!iterator.hasNext())
-        {
+        if (!iterator.hasNext()) {
             throw new EntityNotFoundException(specification);
         }
         return iterator.next();
@@ -68,8 +63,7 @@ public interface Repository<T> extends AutoCloseable
      * @return the collection.
      */
     @Nonnull
-    default Collection<T> listAll()
-    {
+    default Collection<T> listAll() {
         return findAll(new EmptySpecification<>());
     }
 

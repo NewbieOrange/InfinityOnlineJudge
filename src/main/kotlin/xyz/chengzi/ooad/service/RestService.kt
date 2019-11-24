@@ -12,7 +12,10 @@ class RestService(server: ApplicationServer, private val port: Int) {
     private val userController = UserController(server)
     private val sessionController = SessionController(server)
 
-    private val app = Javalin.create().routes {
+    private val app = Javalin.create { config ->
+        config.enableCorsForAllOrigins()
+        config.enableDevLogging()
+    }.routes {
         path("api") {
             path("contests") {
                 get(contestController::listAll)
