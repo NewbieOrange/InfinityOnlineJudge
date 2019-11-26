@@ -1,6 +1,7 @@
 package xyz.chengzi.ooad.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "problems")
@@ -11,8 +12,10 @@ public class Problem {
     private String title;
     private String description;
     private String descriptionHtml;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
+    private List<Submission> submissions;
     private String type;
-    private boolean special;
+    private Boolean special;
     private Integer timeLimit;
     private Integer memoryLimit;
     private Integer acceptedAmount;
@@ -44,6 +47,14 @@ public class Problem {
 
     public void setDescriptionHtml(String descriptionHtml) {
         this.descriptionHtml = descriptionHtml;
+    }
+
+    public List<Submission> getSubmissions() {
+        return submissions;
+    }
+
+    public void setSubmissions(List<Submission> submissions) {
+        this.submissions = submissions;
     }
 
     public String getType() {
