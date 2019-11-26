@@ -7,15 +7,23 @@ import xyz.chengzi.ooad.repository.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 
 class ProblemController(server: ApplicationServer) : AbstractController(server) {
+    private val problemRepository = repositoryService.problemRepository
+
     fun create(ctx: Context) {
         val requestBody = JSONObject(ctx.body())
         val item = Problem()
         item.title = requestBody.getString("title")
         item.description = requestBody.getString("description")
         item.descriptionHtml = requestBody.getString("descriptionHtml")
+        item.type = requestBody.getString("type")
+        item.isSpecial = requestBody.getBoolean("special")
         item.acceptedAmount = 0
         item.submissionAmount = 0
-        repositoryService.problemRepository.add(item)
+        problemRepository.add(item)
+    }
+
+    fun remove(ctx: Context) {
+        problemRepository.remove(problemRepository.findById(ctx.pathParam("id", Int::class.java).get()))
     }
 
     fun listAll(ctx: Context) {

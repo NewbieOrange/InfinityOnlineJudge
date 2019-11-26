@@ -26,6 +26,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 post(problemController::create)
                 path(":id") {
                     get(problemController::getById)
+                    delete(problemController::remove)
                 }
             }
             path("submissions") {

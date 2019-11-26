@@ -11,6 +11,8 @@ public class Problem {
     private String title;
     private String description;
     private String descriptionHtml;
+    private String type;
+    private boolean special;
     private Integer timeLimit;
     private Integer memoryLimit;
     private Integer acceptedAmount;
@@ -42,6 +44,22 @@ public class Problem {
 
     public void setDescriptionHtml(String descriptionHtml) {
         this.descriptionHtml = descriptionHtml;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public boolean isSpecial() {
+        return special;
+    }
+
+    public void setSpecial(boolean special) {
+        this.special = special;
     }
 
     public Integer getTimeLimit() {
