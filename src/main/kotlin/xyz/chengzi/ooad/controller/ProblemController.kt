@@ -1,10 +1,15 @@
 package xyz.chengzi.ooad.controller
 
 import io.javalin.http.Context
+import io.javalin.http.NotFoundResponse
 import org.json.JSONObject
 import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.repository.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
+import java.io.FileInputStream
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.stream.Collectors
 
 class ProblemController(server: ApplicationServer) : AbstractController(server) {
     private val problemRepository = repositoryService.problemRepository
@@ -35,5 +40,39 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
     fun getById(ctx: Context) {
         val item = repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
         ctx.json(item)
+    }
+
+    fun createFile(ctx: Context) {
+        val id = ctx.pathParam("id")
+        val fileName = ctx.pathParam("fileName")
+        val path = Path.of("./problems/$id/$fileName")
+        Files.createDirectories(path.parent)
+        Files.write(path, ctx.bodyAsBytes())
+    }
+
+    fun getFile(ctx: Context) {
+        val id = ctx.pathParam("id")
+        val fileName = ctx.pathParam("fileName")
+        val path = Path.of("./problems/$id/$fileName")
+        if (Files.notExists(path)) {
+            throw NotFoundResponse()
+        }
+        ctx.result(FileInputStream(path.toFile()))
+    }
+
+    fun deleteFile(ctx: Context) {
+        val id = ctx.pathParam("id")
+        val fileName = ctx.pathParam("fileName")
+        val path = Path.of("./problems/$id/$fileName")
+        Files.deleteIfExists(path)
+    }
+
+    fun listFiles(ctx: Context) {
+        val id = ctx.pathParam("id")
+        val path = Path.of("./problems/$id/")
+        if (Files.notExists(path)) {
+            ctx.result("[]");
+        }
+        ctx.result(Files.list(path).map(Path::getFileName).collect(Collectors.toList()).toString())
     }
 }

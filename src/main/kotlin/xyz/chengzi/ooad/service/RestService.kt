@@ -27,6 +27,14 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 path(":id") {
                     get(problemController::getById)
                     delete(problemController::remove)
+                    path("files") {
+                        get(problemController::listFiles)
+                        path(":fileName") {
+                            get(problemController::getFile)
+                            post(problemController::createFile)
+                            delete(problemController::deleteFile)
+                        }
+                    }
                 }
             }
             path("submissions") {
