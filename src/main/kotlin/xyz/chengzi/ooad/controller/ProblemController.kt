@@ -57,7 +57,7 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         if (Files.notExists(path)) {
             throw NotFoundResponse()
         }
-        ctx.result(FileInputStream(path.toFile()))
+        ctx.result(path.toFile().inputStream())
     }
 
     fun deleteFile(ctx: Context) {

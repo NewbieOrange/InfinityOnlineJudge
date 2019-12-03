@@ -72,6 +72,10 @@ public class User {
         return permissions;
     }
 
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
+    }
+
     public boolean hasPermission(String permission) {
         return getPermissions().contains(permission);
     }
