@@ -7,7 +7,9 @@ import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.repository.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.util.stream.Collectors
 
@@ -70,9 +72,10 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
     fun listFiles(ctx: Context) {
         val id = ctx.pathParam("id")
         val path = Path.of("./problems/$id/")
-        if (Files.notExists(path)) {
-            ctx.result("[]");
+        try {
+            ctx.result(Files.list(path).map(Path::getFileName).collect(Collectors.toList()).toString())
+        } catch (e: NoSuchFileException) {
+            ctx.result("[]")
         }
-        ctx.result(Files.list(path).map(Path::getFileName).collect(Collectors.toList()).toString())
     }
 }

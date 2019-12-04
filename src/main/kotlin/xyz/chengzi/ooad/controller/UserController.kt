@@ -36,11 +36,6 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
 
     fun setPermissions(ctx: Context) {
         val id = ctx.pathParam("id", Int::class.java).get()
-        ctx.result(userRepository.findById(id).permissions.toString())
-    }
-
-    fun getPermissions(ctx: Context) {
-        val id = ctx.pathParam("id", Int::class.java).get()
         val permissions = JSONArray(ctx.body())
         val permissionList = ArrayList<String>()
         for (permission in permissions) {
@@ -49,6 +44,11 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
         val user = userRepository.findById(id)
         user.permissions = permissionList
         userRepository.update(user)
+    }
+
+    fun getPermissions(ctx: Context) {
+        val id = ctx.pathParam("id", Int::class.java).get()
+        ctx.result(userRepository.findById(id).permissions.toString())
     }
 
    fun getCurrentUser(ctx: Context) {
