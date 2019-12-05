@@ -29,6 +29,17 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         problemRepository.add(item)
     }
 
+    fun update(ctx: Context) {
+        val requestBody = JSONObject(ctx.body())
+        val item = repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
+        item.title = requestBody.getString("title")
+        item.description = requestBody.getString("description")
+        item.descriptionHtml = requestBody.getString("descriptionHtml")
+        item.type = requestBody.getString("type")
+        item.isSpecial = requestBody.getBoolean("special")
+        problemRepository.update(item)
+    }
+
     fun remove(ctx: Context) {
         problemRepository.remove(problemRepository.findById(ctx.pathParam("id", Int::class.java).get()))
     }

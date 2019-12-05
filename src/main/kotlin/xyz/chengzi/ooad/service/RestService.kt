@@ -26,6 +26,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 post(problemController::create)
                 path(":id") {
                     get(problemController::getById)
+                    patch(problemController::update)
                     delete(problemController::remove)
                     path("files") {
                         get(problemController::listFiles)
