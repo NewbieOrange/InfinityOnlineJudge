@@ -37,10 +37,4 @@ public class AndSpecification<T> implements JpqlSpecification<T> {
         }
         return parameters;
     }
-
-    @Override
-    public int getMaxResults() {
-        return specifications.stream().min(Comparator.comparingInt(Specification::getMaxResults))
-                .map(Specification::getMaxResults).orElse(Integer.MAX_VALUE);
-    }
 }

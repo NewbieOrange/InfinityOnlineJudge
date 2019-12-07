@@ -45,6 +45,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
             path("users") {
                 get(userController::listAll)
                 post(userController::create)
+                get("search", userController::search)
                 path(":id") {
                     get(userController::getById)
                     path("permissions") {

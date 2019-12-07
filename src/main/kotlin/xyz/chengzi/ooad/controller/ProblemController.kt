@@ -4,10 +4,8 @@ import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import org.json.JSONObject
 import xyz.chengzi.ooad.entity.Problem
-import xyz.chengzi.ooad.repository.SinceIdSpecification
+import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
-import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
@@ -32,6 +30,7 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
     fun update(ctx: Context) {
         val requestBody = JSONObject(ctx.body())
         val item = repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
+                ?: throw NotFoundResponse()
         item.title = requestBody.getString("title")
         item.description = requestBody.getString("description")
         item.descriptionHtml = requestBody.getString("descriptionHtml")
@@ -41,18 +40,19 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
     }
 
     fun remove(ctx: Context) {
-        problemRepository.remove(problemRepository.findById(ctx.pathParam("id", Int::class.java).get()))
+        problemRepository.remove(problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
+                ?: throw NotFoundResponse())
     }
 
     fun listAll(ctx: Context) {
         val since = ctx.queryParam("since", "0")!!.toInt()
-        val items = repositoryService.problemRepository.findAll(SinceIdSpecification(since, 10))
+        val items = repositoryService.problemRepository.findAll(SinceIdSpecification(since), 10)
         ctx.json(items)
     }
 
     fun getById(ctx: Context) {
-        val item = repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
-        ctx.json(item)
+        ctx.json(repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
+                ?: throw NotFoundResponse())
     }
 
     fun createFile(ctx: Context) {

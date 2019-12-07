@@ -1,16 +1,16 @@
-package xyz.chengzi.ooad.repository;
+package xyz.chengzi.ooad.repository.entity;
 
 import com.google.common.collect.ImmutableMap;
+import xyz.chengzi.ooad.repository.JpqlSpecification;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 
 public class SinceIdSpecification<T> implements JpqlSpecification<T> {
-    private int since, size;
+    private int since;
 
-    public SinceIdSpecification(int since, int size) {
+    public SinceIdSpecification(int since) {
         this.since = since;
-        this.size = size;
     }
 
     @Nonnull
@@ -23,10 +23,5 @@ public class SinceIdSpecification<T> implements JpqlSpecification<T> {
     @Override
     public Map<String, Object> getJpqlParameters() {
         return new ImmutableMap.Builder<String, Object>().put("since" + hashCode(), since).build();
-    }
-
-    @Override
-    public int getMaxResults() {
-        return size;
     }
 }

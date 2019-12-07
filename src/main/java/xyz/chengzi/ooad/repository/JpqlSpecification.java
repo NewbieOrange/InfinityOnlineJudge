@@ -33,9 +33,6 @@ public interface JpqlSpecification<T> extends Specification<T> {
         for (Map.Entry<String, Object> parameter : getJpqlParameters().entrySet()) {
             query.setParameter(parameter.getKey(), parameter.getValue());
         }
-        if (getMaxResults() >= 0) {
-            query.setMaxResults(getMaxResults());
-        }
         return query;
     }
 

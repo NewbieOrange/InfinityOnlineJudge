@@ -1,9 +1,9 @@
 package xyz.chengzi.ooad.repository;
 
 import xyz.chengzi.ooad.exception.EntityAlreadyExistsException;
-import xyz.chengzi.ooad.exception.EntityNotFoundException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -33,11 +33,10 @@ public interface Repository<T> extends AutoCloseable {
      * Find a specific item from the repository by its id.
      *
      * @param id the id of the item.
-     * @return the item.
-     * @throws EntityNotFoundException If no item with the given id can be found.
+     * @return the item, null if not found.
      */
-    @Nonnull
-    T findById(int id) throws EntityNotFoundException;
+    @Nullable
+    T findById(int id);
 
     /**
      * Find the first item specifying the specification in the repository.
@@ -45,14 +44,13 @@ public interface Repository<T> extends AutoCloseable {
      * If there are multiple matches, only the first one will be returned.
      *
      * @param specification the specification.
-     * @return the item.
-     * @throws EntityNotFoundException If no item with the given specification can be found.
+     * @return the item, null if not found.
      */
-    @Nonnull
-    default T find(@Nonnull Specification<T> specification) throws EntityNotFoundException {
+    @Nullable
+    default T find(@Nonnull Specification<T> specification) {
         Iterator<T> iterator = findAll(specification).iterator();
         if (!iterator.hasNext()) {
-            throw new EntityNotFoundException(specification);
+            return null;
         }
         return iterator.next();
     }
@@ -107,5 +105,17 @@ public interface Repository<T> extends AutoCloseable {
      * @return the list of the items (empty list if none).
      */
     @Nonnull
-    List<T> findAll(@Nonnull Specification<T> specification);
+    default List<T> findAll(@Nonnull Specification<T> specification) {
+        return findAll(specification, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Find all the items specifying the specification in the repository.
+     *
+     * @param specification the specification.
+     * @param maxResults the maximum results size.
+     * @return the list of the items (empty list if none).
+     */
+    @Nonnull
+    List<T> findAll(@Nonnull Specification<T> specification, int maxResults);
 }

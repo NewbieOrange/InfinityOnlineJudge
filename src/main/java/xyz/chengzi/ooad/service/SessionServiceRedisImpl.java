@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import xyz.chengzi.ooad.entity.User;
-import xyz.chengzi.ooad.exception.EntityNotFoundException;
 import xyz.chengzi.ooad.server.ApplicationServer;
 
 import java.security.SecureRandom;
@@ -43,8 +42,6 @@ public class SessionServiceRedisImpl implements SessionService {
             if (id != null) {
                 return server.getRepositoryService().getUserRepository().findById(Ints.fromByteArray(id));
             }
-        } catch (EntityNotFoundException e) {
-            // Ignored, since we will return null anyways.
         }
         return null;
     }

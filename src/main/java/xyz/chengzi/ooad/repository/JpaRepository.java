@@ -1,9 +1,9 @@
 package xyz.chengzi.ooad.repository;
 
 import xyz.chengzi.ooad.exception.EntityAlreadyExistsException;
-import xyz.chengzi.ooad.exception.EntityNotFoundException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.List;
 
@@ -60,38 +60,26 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
         return itemsToRemove;
     }
 
-    @Nonnull
+    @Nullable
     @Override
-    public T findById(int id) throws EntityNotFoundException {
+    public T findById(int id) {
         EntityManager manager = localManager.get();
-        T item = manager.find(tClass, id);
-        if (item == null) {
-            throw new EntityNotFoundException(id);
-        }
-        return item;
+        return manager.find(tClass, id);
     }
 
-    @Nonnull
+    @Nullable
     @Override
-    public T find(@Nonnull Specification<T> specification) throws EntityNotFoundException {
-        EntityManager manager = localManager.get();
-        JpqlSpecification<T> jpqlSpecification = (JpqlSpecification<T>) specification;
-        manager.getTransaction().begin();
-        List<T> resultList = jpqlSpecification
-                .prepare(manager.createQuery(
-                        "SELECT e FROM " + tClass.getSimpleName() + " e WHERE " + jpqlSpecification.toJpqlQuery(),
-                        tClass))
-                .setMaxResults(1).getResultList();
-        manager.getTransaction().commit();
+    public T find(@Nonnull Specification<T> specification) {
+        List<T> resultList = findAll(specification, 1);
         if (resultList.isEmpty()) {
-            throw new EntityNotFoundException(specification);
+            return null;
         }
-        return resultList.iterator().next();
+        return resultList.get(0);
     }
 
     @Nonnull
     @Override
-    public List<T> findAll(@Nonnull Specification<T> specification) {
+    public List<T> findAll(@Nonnull Specification<T> specification, int maxResultsSize) {
         EntityManager manager = localManager.get();
         JpqlSpecification<T> jpqlSpecification = (JpqlSpecification<T>) specification;
         manager.getTransaction().begin();
@@ -99,6 +87,7 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
                 .prepare(manager.createQuery(
                         "SELECT e FROM " + tClass.getSimpleName() + " e WHERE " + jpqlSpecification.toJpqlQuery(),
                         tClass))
+                .setMaxResults(maxResultsSize)
                 .getResultList();
         manager.getTransaction().commit();
         return resultList;
