@@ -3,6 +3,7 @@ package xyz.chengzi.ooad.controller
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import org.json.JSONObject
+import xyz.chengzi.ooad.dto.ProblemResponse
 import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
@@ -22,6 +23,8 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         item.descriptionHtml = requestBody.getString("descriptionHtml")
         item.type = requestBody.getString("type")
         item.isSpecial = requestBody.getBoolean("special")
+        item.timeLimit = requestBody.getInt("timeLimit")
+        item.memoryLimit = requestBody.getInt("memoryLimit")
         item.acceptedAmount = 0
         item.submissionAmount = 0
         problemRepository.add(item)
@@ -47,12 +50,12 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
     fun listAll(ctx: Context) {
         val since = ctx.queryParam("since", "0")!!.toInt()
         val items = repositoryService.problemRepository.findAll(SinceIdSpecification(since), 10)
-        ctx.json(items)
+        ctx.json(items.map { ProblemResponse(it) }.toList())
     }
 
     fun getById(ctx: Context) {
-        ctx.json(repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
-                ?: throw NotFoundResponse())
+        ctx.json(ProblemResponse(problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
+                ?: throw NotFoundResponse()))
     }
 
     fun createFile(ctx: Context) {

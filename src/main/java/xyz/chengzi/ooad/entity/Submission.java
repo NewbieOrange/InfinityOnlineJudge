@@ -1,9 +1,11 @@
 package xyz.chengzi.ooad.entity;
 
+import xyz.chengzi.ooad.embeddable.SubmissionCase;
 import xyz.chengzi.ooad.embeddable.SubmissionStatus;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "submissions")
@@ -16,8 +18,8 @@ public class Submission {
     @OneToOne
     private User user;
     private SubmissionStatus status;
-    private Integer timeUsage;
-    private Integer memoryUsage;
+    @ElementCollection
+    private List<SubmissionCase> cases;
     private String language;
     private Integer codeLength;
     private Date timestamp;
@@ -50,20 +52,12 @@ public class Submission {
         this.status = status;
     }
 
-    public Integer getTimeUsage() {
-        return timeUsage;
+    public List<SubmissionCase> getCases() {
+        return cases;
     }
 
-    public void setTimeUsage(Integer timeUsage) {
-        this.timeUsage = timeUsage;
-    }
-
-    public Integer getMemoryUsage() {
-        return memoryUsage;
-    }
-
-    public void setMemoryUsage(Integer memoryUsage) {
-        this.memoryUsage = memoryUsage;
+    public void setCases(List<SubmissionCase> cases) {
+        this.cases = cases;
     }
 
     public String getLanguage() {

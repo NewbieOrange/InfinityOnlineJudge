@@ -3,12 +3,13 @@ package xyz.chengzi.ooad.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
 public class MapperUtil {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new KotlinModule());
 
     public static ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
