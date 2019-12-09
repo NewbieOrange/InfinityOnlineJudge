@@ -27,7 +27,6 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
 
             <property name="hibernate.cache.use_second_level_cache" value="true"/>
-            <property name="hibernate.cache.default_cache_concurrency_strategy" value="read-write"/>
             <property name="hibernate.cache.region.factory_class" value="infinispan"/>
             <property name="hibernate.cache.infinispan.cfg"
                       value="org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml"/>
