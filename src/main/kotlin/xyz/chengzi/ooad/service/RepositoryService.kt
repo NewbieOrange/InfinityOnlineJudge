@@ -8,7 +8,7 @@ import xyz.chengzi.ooad.repository.user.UserRepository
 import javax.persistence.Persistence
 
 class RepositoryService(persistenceUnitName: String) {
-    val entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName)
+    private val entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName)!!
     val contestRepository = JpaRepository<Contest>(entityManagerFactory, Contest::class.java)
     val problemRepository = JpaRepository<Problem>(entityManagerFactory, Problem::class.java)
     val submissionRepository = JpaRepository<Submission>(entityManagerFactory, Submission::class.java)
