@@ -43,6 +43,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 post(submissionController::create)
                 path(":id") {
                     get(submissionController::getById)
+                    get("code", submissionController::getFile)
                 }
             }
             path("users") {

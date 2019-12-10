@@ -17,6 +17,7 @@ import xyz.chengzi.ooad.server.ApplicationServer
 import xyz.chengzi.ooad.service.RabbitMQService
 import xyz.chengzi.ooad.util.MapperUtil
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.function.Consumer
@@ -77,6 +78,15 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
         submissionRepository.use {
             ctx.json(SubmissionResponse(it.findById(ctx.pathParam("id", Int::class.java).get())
                     ?: throw NotFoundResponse()))
+        }
+    }
+
+    fun getFile(ctx: Context) {
+        val submissionRepository = repositoryService.createSubmissionRepository()
+        val id = ctx.pathParam("id", Int::class.java).get()
+        submissionRepository.use {
+            val item = it.findById(id) ?: throw NotFoundResponse()
+            ctx.result(Files.readString(Path.of("./submissions/$id${extensionNames[item.language]}")))
         }
     }
 
