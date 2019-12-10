@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import xyz.chengzi.ooad.entity.User;
+import xyz.chengzi.ooad.repository.JpaRepository;
+import xyz.chengzi.ooad.repository.user.UserRepository;
 import xyz.chengzi.ooad.server.ApplicationServer;
 
 import java.security.SecureRandom;
@@ -40,7 +42,9 @@ public class SessionServiceRedisImpl implements SessionService {
         try (Jedis jedis = jedisPool.getResource()) {
             byte[] id = jedis.get(token);
             if (id != null) {
-                return server.getRepositoryService().getUserRepository().findById(Ints.fromByteArray(id));
+                try (UserRepository userRepository = server.getRepositoryService().createUserRepository()) {
+                    return userRepository.findById(Ints.fromByteArray(id));
+                }
             }
         }
         return null;

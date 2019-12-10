@@ -13,9 +13,8 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 
 class ProblemController(server: ApplicationServer) : AbstractController(server) {
-    private val problemRepository = repositoryService.problemRepository
-
     fun create(ctx: Context) {
+        val problemRepository = repositoryService.createProblemRepository()
         val requestBody = JSONObject(ctx.body())
         val item = Problem()
         item.title = requestBody.getString("title")
@@ -27,35 +26,47 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         item.memoryLimit = requestBody.getInt("memoryLimit")
         item.acceptedAmount = 0
         item.submissionAmount = 0
-        problemRepository.add(item)
+        problemRepository.use {
+            it.add(item)
+        }
     }
 
     fun update(ctx: Context) {
+        val problemRepository = repositoryService.createProblemRepository()
         val requestBody = JSONObject(ctx.body())
-        val item = repositoryService.problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
-                ?: throw NotFoundResponse()
-        item.title = requestBody.getString("title")
-        item.description = requestBody.getString("description")
-        item.descriptionHtml = requestBody.getString("descriptionHtml")
-        item.type = requestBody.getString("type")
-        item.isSpecial = requestBody.getBoolean("special")
-        problemRepository.update(item)
+        problemRepository.use {
+            val item = it.findById(ctx.pathParam("id", Int::class.java).get()) ?: throw NotFoundResponse()
+            item.title = requestBody.getString("title")
+            item.description = requestBody.getString("description")
+            item.descriptionHtml = requestBody.getString("descriptionHtml")
+            item.type = requestBody.getString("type")
+            item.isSpecial = requestBody.getBoolean("special")
+            problemRepository.update(item)
+        }
     }
 
     fun remove(ctx: Context) {
-        problemRepository.remove(problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
-                ?: throw NotFoundResponse())
+        val problemRepository = repositoryService.createProblemRepository()
+        problemRepository.use {
+            it.remove(it.findById(ctx.pathParam("id", Int::class.java).get()) ?: throw NotFoundResponse())
+        }
     }
 
     fun listAll(ctx: Context) {
+        val problemRepository = repositoryService.createProblemRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
-        val items = repositoryService.problemRepository.findAll(SinceIdSpecification(since), 10)
-        ctx.json(items.map { ProblemResponse(it) }.toList())
+        problemRepository.use { repo ->
+            val items = repo.findAll(SinceIdSpecification(since), 10)
+            ctx.json(items.map { ProblemResponse(it) }.toList())
+        }
     }
 
     fun getById(ctx: Context) {
-        ctx.json(ProblemResponse(problemRepository.findById(ctx.pathParam("id", Int::class.java).get())
-                ?: throw NotFoundResponse()))
+        val problemRepository = repositoryService.createProblemRepository()
+        problemRepository.use {
+            ctx.json(ProblemResponse(it.findById(ctx.pathParam("id", Int::class.java).get())
+                    ?: throw NotFoundResponse()))
+        }
     }
 
     fun createFile(ctx: Context) {

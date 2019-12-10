@@ -8,17 +8,16 @@ import javax.persistence.*;
 import java.util.List;
 
 public class JpaRepository<T> implements Repository<T>, AutoCloseable {
-    private final ThreadLocal<EntityManager> localManager;
+    private final EntityManager manager;
     private final Class<T> tClass;
 
-    public JpaRepository(EntityManagerFactory entityManagerFactory, Class<T> tClass) {
-        localManager = ThreadLocal.withInitial(entityManagerFactory::createEntityManager);
+    public JpaRepository(EntityManager entityManager, Class<T> tClass) {
+        this.manager = entityManager;
         this.tClass = tClass;
     }
 
     @Override
     public void addAll(@Nonnull Iterable<T> items) {
-        EntityManager manager = localManager.get();
         manager.getTransaction().begin();
         try {
             items.forEach(manager::persist);
@@ -30,7 +29,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
 
     @Override
     public void update(@Nonnull T item) {
-        EntityManager manager = localManager.get();
         manager.getTransaction().begin();
         manager.merge(item);
         manager.getTransaction().commit();
@@ -38,7 +36,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
 
     @Override
     public void removeAll(@Nonnull Iterable<T> items) {
-        EntityManager manager = localManager.get();
         manager.getTransaction().begin();
         items.forEach(manager::remove);
         manager.getTransaction().commit();
@@ -47,7 +44,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
     @Nonnull
     @Override
     public List<T> removeAll(@Nonnull Specification<T> specification) {
-        EntityManager manager = localManager.get();
         JpqlSpecification<T> jpqlSpecification = (JpqlSpecification<T>) specification;
         manager.getTransaction().begin();
         List<T> itemsToRemove = jpqlSpecification
@@ -63,7 +59,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
     @Nullable
     @Override
     public T findById(int id) {
-        EntityManager manager = localManager.get();
         return manager.find(tClass, id);
     }
 
@@ -80,7 +75,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
     @Nonnull
     @Override
     public List<T> findAll(@Nonnull Specification<T> specification, int maxResultsSize) {
-        EntityManager manager = localManager.get();
         JpqlSpecification<T> jpqlSpecification = (JpqlSpecification<T>) specification;
         manager.getTransaction().begin();
         List<T> resultList = jpqlSpecification
@@ -95,7 +89,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
 
     @Override
     public void close() {
-        EntityManager manager = localManager.get();
         manager.close();
     }
 }

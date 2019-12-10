@@ -5,14 +5,15 @@ import io.javalin.http.UnauthorizedResponse
 import xyz.chengzi.ooad.server.ApplicationServer
 
 class SessionController(server: ApplicationServer) : AbstractController(server) {
-    private val userRepository = server.repositoryService.userRepository
-
     fun login(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val basicAuthCredentials = ctx.basicAuthCredentials()
-        val user = userRepository.findByUsername(basicAuthCredentials.username)
-        if (user != null && sessionService.checkPassword(user, basicAuthCredentials.password)) {
-            ctx.cookie("token", String(sessionService.generateToken(user)))
-            return
+        userRepository.use {
+            val user = it.findByUsername(basicAuthCredentials.username)
+            if (user != null && sessionService.checkPassword(user, basicAuthCredentials.password)) {
+                ctx.cookie("token", String(sessionService.generateToken(user)))
+                return
+            }
         }
         throw UnauthorizedResponse()
     }

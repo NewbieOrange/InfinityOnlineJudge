@@ -18,30 +18,38 @@ import xyz.chengzi.ooad.server.ApplicationServer
 import java.util.stream.Collectors
 
 class UserController(server: ApplicationServer) : AbstractController(server) {
-    private val userRepository = repositoryService.userRepository
-
     fun create(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val caller = getCallerUser(ctx) ?: throw UnauthorizedResponse()
         if (!caller.hasPermission("users.create")) {
             throw UnauthorizedResponse()
         }
         val body = JSONObject(ctx.body())
         val user = User(body.getString("username"), sessionService.hashPassword(body.getString("password")))
-        userRepository.add(user)
+        userRepository.use {
+            it.add(user)
+        }
     }
 
     fun getById(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val id = ctx.pathParam("id", Int::class.java).get()
-        ctx.json(UserResponse(userRepository.findById(id) ?: throw NotFoundResponse()))
+        userRepository.use {
+            ctx.json(UserResponse(it.findById(id) ?: throw NotFoundResponse()))
+        }
     }
 
     fun listAll(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
-        val items = userRepository.findAll(SinceIdSpecification(since), 10)
-        ctx.json(items.map { UserResponse(it) }.toList())
+        userRepository.use { repo ->
+            val items = repo.findAll(SinceIdSpecification(since), 10)
+            ctx.json(items.map { UserResponse(it) }.toList())
+        }
     }
 
     fun search(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val username = ctx.queryParam("username")
         val permission = ctx.queryParam("permission")
         if (username == null && permission == null) {
@@ -55,19 +63,27 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
         if (permission != null) {
             specification = AndSpecification(specification, PermissionSpecification(permission))
         }
-        ctx.json(userRepository.findAll(specification).map { UserResponse(it) }.toList())
+        userRepository.use { repo ->
+            ctx.json(repo.findAll(specification).map { UserResponse(it) }.toList())
+        }
     }
 
     fun setPermissions(ctx: Context) {
-        val user = userRepository.findById(ctx.pathParam("id", Int::class.java).get()) ?: throw NotFoundResponse()
-        val permissions = JSONArray(ctx.body()).map { it as String }
-        user.permissions = permissions
-        userRepository.update(user)
+        val userRepository = repositoryService.createUserRepository()
+        userRepository.use { repo ->
+            val user = repo.findById(ctx.pathParam("id", Int::class.java).get()) ?: throw NotFoundResponse()
+            val permissions = JSONArray(ctx.body()).map { it as String }
+            user.permissions = permissions
+            repo.update(user)
+        }
     }
 
     fun getPermissions(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val id = ctx.pathParam("id", Int::class.java).get()
-        ctx.json((userRepository.findById(id) ?: throw NotFoundResponse()).permissions)
+        userRepository.use {
+            ctx.json((it.findById(id) ?: throw NotFoundResponse()).permissions)
+        }
     }
 
     fun getCurrentUser(ctx: Context) {

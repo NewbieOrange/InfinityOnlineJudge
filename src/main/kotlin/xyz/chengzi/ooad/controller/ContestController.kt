@@ -9,8 +9,11 @@ class ContestController(server: ApplicationServer) : AbstractController(server) 
     }
 
     fun listAll(ctx: Context) {
+        val contestRepository = repositoryService.createContestRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
-        val contests = repositoryService.contestRepository.findAll(SinceIdSpecification(since), 10)
-        ctx.json(contests)
+        contestRepository.use {
+            val contests = it.findAll(SinceIdSpecification(since), 10)
+            ctx.json(contests)
+        }
     }
 }
