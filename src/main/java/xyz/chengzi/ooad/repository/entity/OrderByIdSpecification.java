@@ -6,22 +6,22 @@ import xyz.chengzi.ooad.repository.JpqlSpecification;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class SinceIdSpecification<T> implements JpqlSpecification<T> {
-    private int since;
+public class OrderByIdSpecification<T> implements JpqlSpecification<T> {
+    private boolean asc;
 
-    public SinceIdSpecification(int since) {
-        this.since = since;
+    public OrderByIdSpecification(boolean desc) {
+        this.asc = desc;
     }
 
     @Nonnull
     @Override
     public String toJpqlQuery() {
-        return "id >= :since" + hashCode();
+        return "ORDER BY id " + (asc ? "ASC" : "DESC");
     }
 
     @Nonnull
     @Override
     public Map<String, Object> getJpqlParameters() {
-        return ImmutableMap.of("since" + hashCode(), since);
+        return ImmutableMap.of();
     }
 }

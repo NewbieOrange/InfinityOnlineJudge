@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import xyz.chengzi.ooad.entity.User;
-import xyz.chengzi.ooad.repository.JpaRepository;
 import xyz.chengzi.ooad.repository.user.UserRepository;
 import xyz.chengzi.ooad.server.ApplicationServer;
 

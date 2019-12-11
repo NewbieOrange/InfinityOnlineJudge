@@ -23,4 +23,8 @@ abstract class AbstractController(server: ApplicationServer) {
         val token = ctx.cookie("token")
         return if (token == null) null else sessionService.findTokenOwner(token.toByteArray())
     }
+
+    fun checkPermission(user: User, permission: String): Boolean {
+        return user.hasPermission(permission) || user.hasPermission("admin")
+    }
 }

@@ -3,6 +3,7 @@ package xyz.chengzi.ooad.entity;
 import xyz.chengzi.ooad.embeddable.Gender;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class User {
         this.email = "";
         this.biography = "";
         this.avatarId = "";
-        this.permissions = List.of();
+        this.permissions = new ArrayList<>();
     }
 
     public User() {

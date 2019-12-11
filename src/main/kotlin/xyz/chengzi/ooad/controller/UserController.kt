@@ -11,6 +11,7 @@ import xyz.chengzi.ooad.entity.User
 import xyz.chengzi.ooad.repository.AndSpecification
 import xyz.chengzi.ooad.repository.EmptySpecification
 import xyz.chengzi.ooad.repository.JpqlSpecification
+import xyz.chengzi.ooad.repository.Specification
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.repository.user.PermissionSpecification
 import xyz.chengzi.ooad.repository.user.UsernameSpecification
@@ -21,7 +22,7 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
     fun create(ctx: Context) {
         val userRepository = repositoryService.createUserRepository()
         val caller = getCallerUser(ctx) ?: throw UnauthorizedResponse()
-        if (!caller.hasPermission("users.create")) {
+        if (!checkPermission(caller, "users.create")) {
             throw UnauthorizedResponse()
         }
         val body = JSONObject(ctx.body())
@@ -56,12 +57,12 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
             throw BadRequestResponse()
         }
 
-        var specification: JpqlSpecification<User> = EmptySpecification()
+        var specification: Specification<User> = EmptySpecification()
         if (username != null) {
-            specification = AndSpecification(specification, UsernameSpecification(username))
+            specification = specification.and(UsernameSpecification(username))
         }
         if (permission != null) {
-            specification = AndSpecification(specification, PermissionSpecification(permission))
+            specification = specification.and(PermissionSpecification(permission))
         }
         userRepository.use { repo ->
             ctx.json(repo.findAll(specification).map { UserResponse(it) }.toList())

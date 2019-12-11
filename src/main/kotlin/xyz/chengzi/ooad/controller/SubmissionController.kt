@@ -7,21 +7,20 @@ import io.javalin.http.UnauthorizedResponse
 import org.json.JSONObject
 import xyz.chengzi.ooad.dto.JudgeRequestMessage
 import xyz.chengzi.ooad.dto.JudgeResponseList
-import xyz.chengzi.ooad.dto.ProblemResponse
 import xyz.chengzi.ooad.dto.SubmissionResponse
 import xyz.chengzi.ooad.embeddable.SubmissionCase
 import xyz.chengzi.ooad.embeddable.SubmissionStatus
 import xyz.chengzi.ooad.entity.Submission
+import xyz.chengzi.ooad.repository.AndSpecification
+import xyz.chengzi.ooad.repository.WithSpecification
+import xyz.chengzi.ooad.repository.entity.OrderByIdSpecification
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import xyz.chengzi.ooad.service.RabbitMQService
 import xyz.chengzi.ooad.util.MapperUtil
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
-import java.util.function.Consumer
-import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 class SubmissionController(server: ApplicationServer) : AbstractController(server) {
@@ -47,7 +46,7 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
             item.timestamp = Date()
             it.add(item)
 
-            val path = Paths.get("./submissions/${item.id}${extensionNames[item.language]}")
+            val path = Path.of("./submissions/${item.id}${extensionNames[item.language]}")
             Files.createFile(path)
             Files.writeString(path, codeContent)
             rabbitMQService.send(MapperUtil.writeValueAsString(JudgeRequestMessage(item.id, item.problem.id, item.language, item.problem.timeLimit, item.problem.memoryLimit, item.problem.isSpecial))) { submissionCallback(it) }
@@ -93,8 +92,9 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
     fun listAll(ctx: Context) {
         val submissionRepository = repositoryService.createSubmissionRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
-        submissionRepository.use {
-            val items = it.findAll(SinceIdSpecification(since), 10)
+        val orderAsc = ctx.queryParam("order", "asc").equals("asc", true)
+        submissionRepository.use { repo ->
+            val items = repo.findAll(SinceIdSpecification<Submission>(since).with(OrderByIdSpecification(orderAsc)), 10)
             ctx.json(items.map { SubmissionResponse(it) }.toList())
         }
     }

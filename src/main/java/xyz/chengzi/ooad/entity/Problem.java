@@ -10,7 +10,9 @@ public class Problem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String title;
+    @Column(columnDefinition = "clob")
     private String description;
+    @Column(columnDefinition = "clob")
     private String descriptionHtml;
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     private List<Submission> submissions;
