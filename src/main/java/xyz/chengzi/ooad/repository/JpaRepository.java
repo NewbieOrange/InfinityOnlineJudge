@@ -5,7 +5,9 @@ import xyz.chengzi.ooad.exception.EntityAlreadyExistsException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.*;
+import javax.persistence.criteria.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JpaRepository<T> implements Repository<T>, AutoCloseable {
     private final EntityManager manager;
@@ -41,21 +43,6 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
         manager.getTransaction().commit();
     }
 
-    @Nonnull
-    @Override
-    public List<T> removeAll(@Nonnull Specification<T> specification) {
-        JpqlSpecification<T> jpqlSpecification = (JpqlSpecification<T>) specification;
-        manager.getTransaction().begin();
-        List<T> itemsToRemove = jpqlSpecification
-                .prepare(manager.createQuery(
-                        "SELECT e FROM " + tClass.getSimpleName() + " e WHERE " + jpqlSpecification.toJpqlQuery(),
-                        tClass))
-                .getResultList();
-        itemsToRemove.forEach(manager::remove);
-        manager.getTransaction().commit();
-        return itemsToRemove;
-    }
-
     @Nullable
     @Override
     public T findById(int id) {
@@ -65,7 +52,7 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
     @Nullable
     @Override
     public T find(@Nonnull Specification<T> specification) {
-        List<T> resultList = findAll(specification, 1);
+        List<T> resultList = findAll(specification, new EmptyOrder<>(), 1);
         if (resultList.isEmpty()) {
             return null;
         }
@@ -74,15 +61,16 @@ public class JpaRepository<T> implements Repository<T>, AutoCloseable {
 
     @Nonnull
     @Override
-    public List<T> findAll(@Nonnull Specification<T> specification, int maxResultsSize) {
-        JpqlSpecification<T> jpqlSpecification = (JpqlSpecification<T>) specification;
+    public List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders, int maxResults) {
         manager.getTransaction().begin();
-        List<T> resultList = jpqlSpecification
-                .prepare(manager.createQuery(
-                        "SELECT e FROM " + tClass.getSimpleName() + " e WHERE " + jpqlSpecification.toJpqlQuery(),
-                        tClass))
-                .setMaxResults(maxResultsSize)
-                .getResultList();
+
+        CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(tClass);
+        Root<T> root = criteriaQuery.from(tClass);
+        criteriaQuery.where(specification.toPredicate(root, criteriaBuilder));
+        criteriaQuery.orderBy(orders.toOrders(root, criteriaBuilder));
+        List<T> resultList = manager.createQuery(criteriaQuery).setMaxResults(maxResults).getResultList();
+
         manager.getTransaction().commit();
         return resultList;
     }

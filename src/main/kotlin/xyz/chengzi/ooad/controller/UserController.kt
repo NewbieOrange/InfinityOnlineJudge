@@ -8,15 +8,12 @@ import org.json.JSONArray
 import org.json.JSONObject
 import xyz.chengzi.ooad.dto.UserResponse
 import xyz.chengzi.ooad.entity.User
-import xyz.chengzi.ooad.repository.AndSpecification
 import xyz.chengzi.ooad.repository.EmptySpecification
-import xyz.chengzi.ooad.repository.JpqlSpecification
 import xyz.chengzi.ooad.repository.Specification
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.repository.user.PermissionSpecification
 import xyz.chengzi.ooad.repository.user.UsernameSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
-import java.util.stream.Collectors
 
 class UserController(server: ApplicationServer) : AbstractController(server) {
     fun create(ctx: Context) {
@@ -43,21 +40,10 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
     fun listAll(ctx: Context) {
         val userRepository = repositoryService.createUserRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
-        userRepository.use { repo ->
-            val items = repo.findAll(SinceIdSpecification(since), 10)
-            ctx.json(items.map { UserResponse(it) }.toList())
-        }
-    }
-
-    fun search(ctx: Context) {
-        val userRepository = repositoryService.createUserRepository()
         val username = ctx.queryParam("username")
         val permission = ctx.queryParam("permission")
-        if (username == null && permission == null) {
-            throw BadRequestResponse()
-        }
 
-        var specification: Specification<User> = EmptySpecification()
+        var specification: Specification<User> = SinceIdSpecification(since)
         if (username != null) {
             specification = specification.and(UsernameSpecification(username))
         }
@@ -65,7 +51,7 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
             specification = specification.and(PermissionSpecification(permission))
         }
         userRepository.use { repo ->
-            ctx.json(repo.findAll(specification).map { UserResponse(it) }.toList())
+            ctx.json(repo.findAll(specification, 10).map { UserResponse(it) }.toList())
         }
     }
 

@@ -90,15 +90,6 @@ public interface Repository<T> extends AutoCloseable {
     void removeAll(@Nonnull Iterable<T> items);
 
     /**
-     * Remove all the items specifying the specification from the repository.
-     *
-     * @param specification the specification.
-     * @return the list of removed items (empty list if none).
-     */
-    @Nonnull
-    List<T> removeAll(@Nonnull Specification<T> specification);
-
-    /**
      * Find all the items specifying the specification in the repository.
      *
      * @param specification the specification.
@@ -106,16 +97,41 @@ public interface Repository<T> extends AutoCloseable {
      */
     @Nonnull
     default List<T> findAll(@Nonnull Specification<T> specification) {
-        return findAll(specification, Integer.MAX_VALUE);
+        return findAll(specification, new EmptyOrder<>(), Integer.MAX_VALUE);
     }
 
     /**
      * Find all the items specifying the specification in the repository.
      *
      * @param specification the specification.
-     * @param maxResults the maximum results size.
+     * @param orders        the query orders.
      * @return the list of the items (empty list if none).
      */
     @Nonnull
-    List<T> findAll(@Nonnull Specification<T> specification, int maxResults);
+    default List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders) {
+        return findAll(specification, orders, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Find all the items specifying the specification in the repository.
+     *
+     * @param specification the specification.
+     * @param maxResults    the maximum results size.
+     * @return the list of the items (empty list if none).
+     */
+    @Nonnull
+    default List<T> findAll(@Nonnull Specification<T> specification, int maxResults) {
+        return findAll(specification, new EmptyOrder<>(), maxResults);
+    }
+
+    /**
+     * Find all the items specifying the specification in the repository.
+     *
+     * @param specification the specification.
+     * @param orders        the query orders.
+     * @param maxResults    the maximum results size.
+     * @return the list of the items (empty list if none).
+     */
+    @Nonnull
+    List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders, int maxResults);
 }

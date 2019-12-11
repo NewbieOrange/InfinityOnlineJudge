@@ -1,20 +1,17 @@
 package xyz.chengzi.ooad.repository;
 
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Map;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
-public class EmptySpecification<T> implements JpqlSpecification<T>
-{
-    @Nonnull
-    @Override public String toJpqlQuery()
-    {
-        return "TRUE = TRUE";
+public class EmptySpecification<T> extends AbstractSpecification<T> {
+    @Override
+    public boolean isSatisfiedBy(T t) {
+        return true;
     }
 
-    @Nonnull
-    @Override public Map<String, Object> getJpqlParameters()
-    {
-        return Collections.emptyMap();
+    @Override
+    public Predicate toPredicate(Root<T> poll, CriteriaBuilder criteriaBuilder) {
+        return criteriaBuilder.and();
     }
 }

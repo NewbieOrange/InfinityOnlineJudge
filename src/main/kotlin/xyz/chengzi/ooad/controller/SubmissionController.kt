@@ -11,9 +11,9 @@ import xyz.chengzi.ooad.dto.SubmissionResponse
 import xyz.chengzi.ooad.embeddable.SubmissionCase
 import xyz.chengzi.ooad.embeddable.SubmissionStatus
 import xyz.chengzi.ooad.entity.Submission
-import xyz.chengzi.ooad.repository.AndSpecification
-import xyz.chengzi.ooad.repository.WithSpecification
-import xyz.chengzi.ooad.repository.entity.OrderByIdSpecification
+import xyz.chengzi.ooad.repository.Orders
+import xyz.chengzi.ooad.repository.entity.EntityIdAscOrders
+import xyz.chengzi.ooad.repository.entity.EntityIdDescOrders
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import xyz.chengzi.ooad.service.RabbitMQService
@@ -93,8 +93,13 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
         val submissionRepository = repositoryService.createSubmissionRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
         val orderAsc = ctx.queryParam("order", "asc").equals("asc", true)
+        val order: Orders<Submission> = if (orderAsc) {
+            EntityIdAscOrders()
+        } else {
+            EntityIdDescOrders()
+        }
         submissionRepository.use { repo ->
-            val items = repo.findAll(SinceIdSpecification<Submission>(since).with(OrderByIdSpecification(orderAsc)), 10)
+            val items = repo.findAll(SinceIdSpecification(since), order, 10)
             ctx.json(items.map { SubmissionResponse(it) }.toList())
         }
     }

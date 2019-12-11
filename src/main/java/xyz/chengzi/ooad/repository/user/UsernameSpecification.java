@@ -1,28 +1,27 @@
 package xyz.chengzi.ooad.repository.user;
 
-import com.google.common.collect.ImmutableMap;
 import xyz.chengzi.ooad.entity.User;
-import xyz.chengzi.ooad.repository.JpqlSpecification;
+import xyz.chengzi.ooad.repository.AbstractSpecification;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
-public class UsernameSpecification implements JpqlSpecification<User> {
+public class UsernameSpecification extends AbstractSpecification<User> {
     private String username;
 
     public UsernameSpecification(@Nonnull String username) {
         this.username = username;
     }
 
-    @Nonnull
     @Override
-    public String toJpqlQuery() {
-        return "username = :username" + hashCode();
+    public boolean isSatisfiedBy(User user) {
+        return user.getUsername().equals(username);
     }
 
-    @Nonnull
     @Override
-    public Map<String, Object> getJpqlParameters() {
-        return ImmutableMap.of("username" + hashCode(), username);
+    public Predicate toPredicate(Root<User> poll, CriteriaBuilder criteriaBuilder) {
+        return criteriaBuilder.equal(poll.get("username"), username);
     }
 }

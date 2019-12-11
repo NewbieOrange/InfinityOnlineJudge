@@ -1,27 +1,25 @@
 package xyz.chengzi.ooad.repository.entity;
 
-import com.google.common.collect.ImmutableMap;
-import xyz.chengzi.ooad.repository.JpqlSpecification;
+import xyz.chengzi.ooad.repository.AbstractSpecification;
 
-import javax.annotation.Nonnull;
-import java.util.Map;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
-public class SinceIdSpecification<T> implements JpqlSpecification<T> {
+public class SinceIdSpecification<T> extends AbstractSpecification<T> {
     private int since;
 
     public SinceIdSpecification(int since) {
         this.since = since;
     }
 
-    @Nonnull
     @Override
-    public String toJpqlQuery() {
-        return "id >= :since" + hashCode();
+    public boolean isSatisfiedBy(T t) {
+        return false;
     }
 
-    @Nonnull
     @Override
-    public Map<String, Object> getJpqlParameters() {
-        return ImmutableMap.of("since" + hashCode(), since);
+    public Predicate toPredicate(Root<T> poll, CriteriaBuilder criteriaBuilder) {
+        return criteriaBuilder.greaterThanOrEqualTo(poll.get("id"), since);
     }
 }

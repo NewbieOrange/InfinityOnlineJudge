@@ -1,15 +1,17 @@
 package xyz.chengzi.ooad.repository;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 public interface Specification<T> {
-    default Specification<T> and(Specification<T> specification) {
-        return new AndSpecification<>(this, specification);
-    }
+    boolean isSatisfiedBy(T t);
 
-    default Specification<T> or(Specification<T> specification) {
-        return new OrSpecification<>(this, specification);
-    }
+    Predicate toPredicate(Root<T> root, CriteriaBuilder criteriaBuilder);
 
-    default Specification<T> with(Specification<T> specification) {
-        return new WithSpecification<>(this, specification);
-    }
+    Specification<T> and(Specification<T> another);
+
+    Specification<T> or(Specification<T> another);
+
+    Class<T> getType();
 }
