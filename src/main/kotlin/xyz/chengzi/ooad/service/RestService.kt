@@ -2,6 +2,9 @@ package xyz.chengzi.ooad.service
 
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
+import io.javalin.apibuilder.EndpointGroup
+import io.javalin.http.Context
+import io.javalin.http.Handler
 import xyz.chengzi.ooad.controller.*
 import xyz.chengzi.ooad.server.ApplicationServer
 
@@ -14,7 +17,6 @@ class RestService(server: ApplicationServer, private val port: Int) {
 
     private val app = Javalin.create { config ->
         config.enableCorsForAllOrigins()
-        config.enableDevLogging()
     }.routes {
         path("api") {
             path("contests") {
@@ -28,6 +30,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
                     get(problemController::getById)
                     patch(problemController::update)
                     delete(problemController::remove)
+                    get("ranklist", problemController::listSubmissionRank)
                     path("files") {
                         get(problemController::listFiles)
                         path(":fileName") {
@@ -64,6 +67,15 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 post(sessionController::login)
                 delete(sessionController::logout)
             }
+        }
+    }
+
+    fun register(method: String, path: String, handler: (Context) -> Unit) {
+        when (method.toLowerCase()) {
+            "get" -> app.get(path, handler)
+            "post" -> app.post(path, handler)
+            "patch" -> app.patch(path, handler)
+            "delete" -> app.delete(path, handler)
         }
     }
 

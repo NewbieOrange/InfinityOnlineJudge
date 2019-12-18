@@ -108,8 +108,8 @@ public interface Repository<T> extends AutoCloseable {
      * @return the list of the items (empty list if none).
      */
     @Nonnull
-    default List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders) {
-        return findAll(specification, orders, Integer.MAX_VALUE);
+    default List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders, int maxResults) {
+        return findAll(specification, orders, new EmptyGroups<>(), false, maxResults);
     }
 
     /**
@@ -121,7 +121,7 @@ public interface Repository<T> extends AutoCloseable {
      */
     @Nonnull
     default List<T> findAll(@Nonnull Specification<T> specification, int maxResults) {
-        return findAll(specification, new EmptyOrder<>(), maxResults);
+        return findAll(specification, new EmptyOrder<>(), new EmptyGroups<>(), false, maxResults);
     }
 
     /**
@@ -129,9 +129,12 @@ public interface Repository<T> extends AutoCloseable {
      *
      * @param specification the specification.
      * @param orders        the query orders.
+     * @param groups        the query groups.
+     * @param distinct      whether distinct results or not.
      * @param maxResults    the maximum results size.
      * @return the list of the items (empty list if none).
      */
     @Nonnull
-    List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders, int maxResults);
+    List<T> findAll(@Nonnull Specification<T> specification, Orders<T> orders, Groups<T> groups,
+                    boolean distinct, int maxResults);
 }

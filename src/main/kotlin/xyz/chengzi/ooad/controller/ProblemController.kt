@@ -4,8 +4,14 @@ import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import org.json.JSONObject
 import xyz.chengzi.ooad.dto.ProblemResponse
+import xyz.chengzi.ooad.dto.SubmissionResponse
+import xyz.chengzi.ooad.embeddable.SubmissionStatus
 import xyz.chengzi.ooad.entity.Problem
+import xyz.chengzi.ooad.repository.EmptyGroups
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
+import xyz.chengzi.ooad.repository.submission.SubmissionByTimeMemoryOrder
+import xyz.chengzi.ooad.repository.submission.SubmissionFromProblemSpecification
+import xyz.chengzi.ooad.repository.submission.SubmissionStatusSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
@@ -66,6 +72,18 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         problemRepository.use {
             ctx.json(ProblemResponse(it.findById(ctx.pathParam("id", Int::class.java).get())
                     ?: throw NotFoundResponse()))
+        }
+    }
+
+    fun listSubmissionRank(ctx: Context) {
+        val problemRepository = repositoryService.createProblemRepository()
+        val id = ctx.pathParam("id", Int::class.java).get()
+        val since = ctx.queryParam("since", "0")!!.toInt()
+
+        problemRepository.use { problemRepo ->
+            val problem = problemRepo.findById(id)!!
+            val items = problem.rankList
+            ctx.json(items.map { SubmissionResponse(it.value) })
         }
     }
 

@@ -4,6 +4,7 @@ import xyz.chengzi.ooad.entity.Contest
 import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.entity.Submission
 import xyz.chengzi.ooad.repository.JpaRepository
+import xyz.chengzi.ooad.repository.submission.SubmissionRepository
 import xyz.chengzi.ooad.repository.user.UserRepository
 import javax.persistence.EntityManager
 import javax.persistence.Persistence
@@ -23,8 +24,8 @@ class RepositoryService(persistenceUnitName: String) {
         return createRepository(Problem::class.java)
     }
 
-    fun createSubmissionRepository(): JpaRepository<Submission> {
-        return createRepository(Submission::class.java)
+    fun createSubmissionRepository(): SubmissionRepository {
+        return SubmissionRepository(entityManagerFactory.createEntityManager())
     }
 
     fun createUserRepository(): UserRepository {

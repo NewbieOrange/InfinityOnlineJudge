@@ -1,17 +1,17 @@
 package xyz.chengzi.ooad.repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
-public abstract class AbstractOrders<T> implements Orders<T> {
+public abstract class AbstractGroups<T> implements Groups<T> {
     @Override
-    public abstract Order[] toOrders(Root<T> poll, CriteriaBuilder criteriaBuilder);
+    public abstract List<Expression<?>> toGroups(Root<T> poll);
 
     @Override
-    public Orders<T> and(Orders<T> another) {
-        return new AndOrders<>(this, another);
+    public Groups<T> and(Groups<T> another) {
+        return new AndGroups<>(this, another);
     }
 
     @Override

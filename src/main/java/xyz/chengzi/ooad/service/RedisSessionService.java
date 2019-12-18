@@ -13,13 +13,13 @@ import xyz.chengzi.ooad.server.ApplicationServer;
 import java.security.SecureRandom;
 import java.util.UUID;
 
-public class SessionServiceRedisImpl implements SessionService {
+public class RedisSessionService implements SessionService {
     private static final int TIME_OUT_SECS = 60 * 60 * 12; // Token expires in 12 hours after generation.
     private final SecureRandom secureRandom = new SecureRandom();
     private final ApplicationServer server;
     private final JedisPool jedisPool;
 
-    public SessionServiceRedisImpl(ApplicationServer server, JedisPool jedisPool) {
+    public RedisSessionService(ApplicationServer server, JedisPool jedisPool) {
         this.server = server;
         this.jedisPool = jedisPool;
     }

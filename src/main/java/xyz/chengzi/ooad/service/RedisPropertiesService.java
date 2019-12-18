@@ -6,10 +6,10 @@ import redis.clients.jedis.JedisPool;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class PropertiesServiceRedisImpl implements PropertiesService {
+public class RedisPropertiesService implements PropertiesService {
     private final JedisPool jedisPool;
 
-    public PropertiesServiceRedisImpl(JedisPool jedisPool) {
+    public RedisPropertiesService(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
 

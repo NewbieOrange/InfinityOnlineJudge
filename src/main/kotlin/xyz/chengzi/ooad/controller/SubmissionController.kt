@@ -11,10 +11,13 @@ import xyz.chengzi.ooad.dto.SubmissionResponse
 import xyz.chengzi.ooad.embeddable.SubmissionCase
 import xyz.chengzi.ooad.embeddable.SubmissionStatus
 import xyz.chengzi.ooad.entity.Submission
+import xyz.chengzi.ooad.repository.EmptySpecification
 import xyz.chengzi.ooad.repository.Orders
+import xyz.chengzi.ooad.repository.Specification
 import xyz.chengzi.ooad.repository.entity.EntityIdAscOrders
 import xyz.chengzi.ooad.repository.entity.EntityIdDescOrders
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
+import xyz.chengzi.ooad.repository.submission.SubmissionByUserSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import xyz.chengzi.ooad.service.RabbitMQService
 import xyz.chengzi.ooad.util.MapperUtil
@@ -24,7 +27,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class SubmissionController(server: ApplicationServer) : AbstractController(server) {
-    private val extensionNames = ImmutableMap.of("gcc", ".c", "g++", ".cpp", "java", ".java", "python", ".py")
+    private val extensionNames = ImmutableMap.of("gcc", ".c", "g++", ".cpp", "java", ".java", "python", ".py", "sql", ".sql")
     private val rabbitMQService = RabbitMQService()
 
     fun create(ctx: Context) {
@@ -35,7 +38,10 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
         val codeContent = requestBody.getString("code")
         val item = Submission()
         problemRepository.use {
-            item.problem = it.findById(requestBody.getInt("problem"))
+            val problem = it.findById(requestBody.getInt("problem"))!!
+            problem.submissionAmount++
+            item.problem = problem
+            it.update(problem)
         }
         submissionRepository.use {
             item.user = caller
@@ -55,8 +61,11 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
     }
 
     private fun submissionCallback(str: String) {
+        println("Received from MQ: $str")
+        val problemRepository = repositoryService.createProblemRepository()
         val submissionRepository = repositoryService.createSubmissionRepository()
         val responseList = MapperUtil.readValue(str, JudgeResponseList::class.java)
+
         submissionRepository.use { repo ->
             val submission = repo.findById(responseList.id)!!
             submission.status = SubmissionStatus.valueOf(responseList.status)
@@ -68,7 +77,24 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
                 case.memoryUsage = it.memory
                 case
             }
+            submission.timeUsage = submission.cases.sumBy { it.timeUsage }.takeIf { it > 0 }
+            submission.memoryUsage = submission.cases.maxBy { it.memoryUsage }?.memoryUsage
             repo.update(submission)
+
+            problemRepository.use {
+                val problem = submission.problem
+                if (submission.status == SubmissionStatus.ACCEPTED) {
+                    val oldSubmission = problem.rankList.remove(submission.user)
+                    it.update(problem)
+                    if (oldSubmission != null) {
+                        problem.rankList[submission.user] = minOf(oldSubmission, submission)
+                    } else {
+                        problem.rankList[submission.user] = submission
+                        problem.acceptedAmount++
+                    }
+                    it.update(problem)
+                }
+            }
         }
     }
 
@@ -90,16 +116,26 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
     }
 
     fun listAll(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val submissionRepository = repositoryService.createSubmissionRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
         val orderAsc = ctx.queryParam("order", "asc").equals("asc", true)
+        val userId = ctx.queryParam("user")
+
         val order: Orders<Submission> = if (orderAsc) {
             EntityIdAscOrders()
         } else {
             EntityIdDescOrders()
         }
+        var submitByUserSpecification: Specification<Submission> = EmptySpecification()
+        userRepository.use {
+            if (userId != null) {
+                val user = it.findById(userId.toInt())
+                submitByUserSpecification = SubmissionByUserSpecification(user)
+            }
+        }
         submissionRepository.use { repo ->
-            val items = repo.findAll(SinceIdSpecification(since), order, 10)
+            val items = repo.findAll(submitByUserSpecification.and(SinceIdSpecification(since)), order, 10)
             ctx.json(items.map { SubmissionResponse(it) }.toList())
         }
     }

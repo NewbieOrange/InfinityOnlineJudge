@@ -1,6 +1,5 @@
 package xyz.chengzi.ooad.controller
 
-import io.javalin.http.BadRequestResponse
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import io.javalin.http.UnauthorizedResponse
@@ -8,7 +7,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import xyz.chengzi.ooad.dto.UserResponse
 import xyz.chengzi.ooad.entity.User
-import xyz.chengzi.ooad.repository.EmptySpecification
 import xyz.chengzi.ooad.repository.Specification
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.repository.user.PermissionSpecification
