@@ -20,6 +20,8 @@ public class Problem {
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     @OrderBy(value = "timeUsage, memoryUsage")
     private Map<User, Submission> rankList;
+    @OneToOne
+    private Discussion discussion;
     private String type;
 
     private Boolean special;
@@ -70,6 +72,14 @@ public class Problem {
 
     public void setRankList(Map<User, Submission> rankList) {
         this.rankList = rankList;
+    }
+
+    public Discussion getDiscussion() {
+        return discussion;
+    }
+
+    public void setDiscussion(Discussion discussion) {
+        this.discussion = discussion;
     }
 
     public String getType() {

@@ -6,6 +6,7 @@ import org.json.JSONObject
 import xyz.chengzi.ooad.dto.ProblemResponse
 import xyz.chengzi.ooad.dto.SubmissionResponse
 import xyz.chengzi.ooad.embeddable.SubmissionStatus
+import xyz.chengzi.ooad.entity.Discussion
 import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.repository.EmptyGroups
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
@@ -21,6 +22,8 @@ import java.util.stream.Collectors
 class ProblemController(server: ApplicationServer) : AbstractController(server) {
     fun create(ctx: Context) {
         val problemRepository = repositoryService.createProblemRepository()
+        val discussionRepository = repositoryService.createDiscussionRepository()
+
         val requestBody = JSONObject(ctx.body())
         val item = Problem()
         item.title = requestBody.getString("title")
@@ -32,6 +35,11 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         item.memoryLimit = requestBody.getInt("memoryLimit")
         item.acceptedAmount = 0
         item.submissionAmount = 0
+        discussionRepository.use {
+            val discussion = Discussion()
+            it.add(discussion)
+            item.discussion = discussion
+        }
         problemRepository.use {
             it.add(item)
         }
@@ -47,6 +55,8 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
             item.descriptionHtml = requestBody.getString("descriptionHtml")
             item.type = requestBody.getString("type")
             item.isSpecial = requestBody.getBoolean("special")
+            item.timeLimit = requestBody.getInt("timeLimit")
+            item.memoryLimit = requestBody.getInt("memoryLimit")
             problemRepository.update(item)
         }
     }

@@ -11,6 +11,7 @@ import xyz.chengzi.ooad.server.ApplicationServer
 class RestService(server: ApplicationServer, private val port: Int) {
     private val contestController = ContestController(server)
     private val problemController = ProblemController(server)
+    private val discussionController = DiscussionController(server)
     private val submissionController = SubmissionController(server)
     private val userController = UserController(server)
     private val sessionController = SessionController(server)
@@ -31,6 +32,10 @@ class RestService(server: ApplicationServer, private val port: Int) {
                     patch(problemController::update)
                     delete(problemController::remove)
                     get("ranklist", problemController::listSubmissionRank)
+                    path("discussions") {
+                        get(discussionController::listAll)
+                        post(discussionController::create)
+                    }
                     path("files") {
                         get(problemController::listFiles)
                         path(":fileName") {
