@@ -2,6 +2,7 @@ package xyz.chengzi.ooad.controller
 
 import io.javalin.http.Context
 import io.javalin.http.UnauthorizedResponse
+import xyz.chengzi.ooad.repository.user.UsernameSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 
 class SessionController(server: ApplicationServer) : AbstractController(server) {
@@ -9,7 +10,7 @@ class SessionController(server: ApplicationServer) : AbstractController(server) 
         val userRepository = repositoryService.createUserRepository()
         val basicAuthCredentials = ctx.basicAuthCredentials()
         userRepository.use {
-            val user = it.findByUsername(basicAuthCredentials.username)
+            val user = it.find(UsernameSpecification(basicAuthCredentials.username))
             if (user != null && sessionService.checkPassword(user, basicAuthCredentials.password)) {
                 ctx.cookie("token", String(sessionService.generateToken(user)))
                 return
@@ -19,7 +20,10 @@ class SessionController(server: ApplicationServer) : AbstractController(server) 
     }
 
     fun logout(ctx: Context) {
-        sessionService.invalidateToken(getCallerUser(ctx))
+        val userRepository = repositoryService.createUserRepository()
+        sessionService.invalidateToken(userRepository.use {
+            getCallerUser(it, ctx)
+        })
         ctx.clearCookieStore()
     }
 }

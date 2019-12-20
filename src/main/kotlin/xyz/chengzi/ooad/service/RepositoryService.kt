@@ -1,43 +1,42 @@
 package xyz.chengzi.ooad.service
 
-import xyz.chengzi.ooad.entity.Contest
-import xyz.chengzi.ooad.entity.Discussion
-import xyz.chengzi.ooad.entity.Problem
-import xyz.chengzi.ooad.entity.Submission
+import xyz.chengzi.ooad.entity.*
 import xyz.chengzi.ooad.repository.JpaRepository
-import xyz.chengzi.ooad.repository.submission.SubmissionRepository
-import xyz.chengzi.ooad.repository.user.UserRepository
-import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
 class RepositoryService(persistenceUnitName: String) {
     private val entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName)!!
 
-    fun <T> createRepository(clazz: Class<T>): JpaRepository<T> {
-        return JpaRepository<T>(entityManagerFactory.createEntityManager(), clazz)
+    inline fun <reified T> createRepository(): JpaRepository<T> {
+        return JpaRepository(`access$entityManagerFactory`.createEntityManager(), T::class.java)
     }
 
     fun createContestRepository(): JpaRepository<Contest> {
-        return createRepository(Contest::class.java)
+        return createRepository()
     }
 
     fun createProblemRepository(): JpaRepository<Problem> {
-        return createRepository(Problem::class.java)
+        return createRepository()
     }
 
     fun createDiscussionRepository(): JpaRepository<Discussion> {
-        return createRepository(Discussion::class.java)
+        return createRepository()
     }
 
-    fun createSubmissionRepository(): SubmissionRepository {
-        return SubmissionRepository(entityManagerFactory.createEntityManager())
+    fun createSubmissionRepository(): JpaRepository<Submission> {
+        return createRepository()
     }
 
-    fun createUserRepository(): UserRepository {
-        return UserRepository(entityManagerFactory.createEntityManager())
+    fun createUserRepository(): JpaRepository<User> {
+        return createRepository()
     }
 
     fun close() {
         entityManagerFactory.close()
     }
+
+    @PublishedApi
+    internal val `access$entityManagerFactory`: EntityManagerFactory
+        get() = entityManagerFactory
 }

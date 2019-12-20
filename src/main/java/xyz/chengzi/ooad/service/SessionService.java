@@ -3,6 +3,7 @@ package xyz.chengzi.ooad.service;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.chengzi.ooad.entity.User;
+import xyz.chengzi.ooad.repository.Repository;
 
 public interface SessionService {
     /**
@@ -30,7 +31,7 @@ public interface SessionService {
      * @return the user corresponding to the token, null if none.
      */
     @Nullable
-    User findTokenOwner(@NotNull byte[] token);
+    User findTokenOwner(@NotNull Repository<User> userRepository, @NotNull byte[] token);
 
     /**
      * Get the token of the given user if present.

@@ -7,6 +7,8 @@ class SubmissionResponse(submission: Submission) {
     val problem = submission.problem.id
     val user = submission.user.id
     val status = submission.status
+    val totalTime = submission.timeUsage
+    val peakMemory = submission.memoryUsage
     val cases = submission.cases
     val language = submission.language
     val codeLength = submission.codeLength

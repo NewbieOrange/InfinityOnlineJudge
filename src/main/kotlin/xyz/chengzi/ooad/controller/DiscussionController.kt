@@ -8,6 +8,7 @@ import xyz.chengzi.ooad.server.ApplicationServer
 
 class DiscussionController(server: ApplicationServer) : AbstractController(server) {
     fun create(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val problemRepository = repositoryService.createProblemRepository()
         val discussionRepository = repositoryService.createDiscussionRepository()
 
@@ -24,7 +25,9 @@ class DiscussionController(server: ApplicationServer) : AbstractController(serve
             })
             val discussion = Discussion()
             discussion.parent = parent
-            discussion.user = getCallerUser(ctx)
+            discussion.user = userRepository.use {
+                getCallerUser(it, ctx)
+            }
             discussion.comment = request.comment
             repo.add(discussion)
         }

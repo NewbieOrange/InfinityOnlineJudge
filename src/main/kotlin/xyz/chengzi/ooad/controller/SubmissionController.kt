@@ -31,10 +31,11 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
     private val rabbitMQService = RabbitMQService()
 
     fun create(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
         val problemRepository = repositoryService.createProblemRepository()
         val submissionRepository = repositoryService.createSubmissionRepository()
         val requestBody = JSONObject(ctx.body())
-        val caller = getCallerUser(ctx) ?: throw UnauthorizedResponse()
+        val caller = userRepository.use { getCallerUser(it, ctx) } ?: throw UnauthorizedResponse()
         val codeContent = requestBody.getString("code")
         val item = Submission()
         problemRepository.use {
@@ -84,13 +85,8 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
             problemRepository.use {
                 val problem = submission.problem
                 if (submission.status == SubmissionStatus.ACCEPTED) {
-                    val oldSubmission = problem.rankList.remove(submission.user)
-                    it.update(problem)
-                    if (oldSubmission != null) {
-                        problem.rankList[submission.user] = minOf(oldSubmission, submission)
-                    } else {
-                        problem.rankList[submission.user] = submission
-                        problem.acceptedAmount++
+                    problem.rankList.merge(submission.user, submission) { v1, v2 ->
+                        minOf(v1, v2)
                     }
                     it.update(problem)
                 }

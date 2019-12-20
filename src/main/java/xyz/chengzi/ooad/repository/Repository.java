@@ -1,9 +1,8 @@
 package xyz.chengzi.ooad.repository;
 
-import xyz.chengzi.ooad.exception.EntityAlreadyExistsException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -14,10 +13,18 @@ public interface Repository<T> extends AutoCloseable {
      * Add the given item to the repository.
      *
      * @param item the item.
-     * @throws EntityAlreadyExistsException the object already exists (or one with the same unique fields).
      */
     default void add(@Nonnull T item) {
         addAll(Collections.singleton(item));
+    }
+
+    /**
+     * Update the given item into the repository.
+     *
+     * @param item the item.
+     */
+    default void update(@Nonnull T item) {
+        updateAll(Collections.singleton(item));
     }
 
     /**
@@ -71,16 +78,15 @@ public interface Repository<T> extends AutoCloseable {
      * If any exception occur during the operation, nothing will be added.
      *
      * @param items the items.
-     * @throws EntityAlreadyExistsException the object already exists (or one with the same unique fields).
      */
     void addAll(@Nonnull Iterable<T> items);
 
     /**
-     * Update the given item into the repository.
+     * Update the given items into the repository.
      *
-     * @param item the item.
+     * @param items the items.
      */
-    void update(@Nonnull T item);
+    void updateAll(@Nonnull Iterable<T> items);
 
     /**
      * Remove the give items from the repository.

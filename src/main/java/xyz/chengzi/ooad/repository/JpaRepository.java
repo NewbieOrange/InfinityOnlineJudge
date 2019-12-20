@@ -1,12 +1,11 @@
 package xyz.chengzi.ooad.repository;
 
-import org.jetbrains.annotations.NotNull;
-import xyz.chengzi.ooad.exception.EntityAlreadyExistsException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.persistence.*;
-import javax.persistence.criteria.*;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 public class JpaRepository<T> implements Repository<T> {
@@ -21,18 +20,14 @@ public class JpaRepository<T> implements Repository<T> {
     @Override
     public void addAll(@Nonnull Iterable<T> items) {
         manager.getTransaction().begin();
-        try {
-            items.forEach(manager::persist);
-            manager.getTransaction().commit();
-        } catch (RollbackException e) {
-            throw new EntityAlreadyExistsException(e);
-        }
+        items.forEach(manager::persist);
+        manager.getTransaction().commit();
     }
 
     @Override
-    public void update(@Nonnull T item) {
+    public void updateAll(@Nonnull Iterable<T> items) {
         manager.getTransaction().begin();
-        manager.merge(item);
+        items.forEach(manager::merge);
         manager.getTransaction().commit();
     }
 

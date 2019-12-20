@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import xyz.chengzi.ooad.entity.User;
-import xyz.chengzi.ooad.repository.user.UserRepository;
+import xyz.chengzi.ooad.repository.Repository;
 import xyz.chengzi.ooad.server.ApplicationServer;
 
 import java.security.SecureRandom;
@@ -37,13 +37,11 @@ public class RedisSessionService implements SessionService {
 
     @Nullable
     @Override
-    public User findTokenOwner(@NotNull byte[] token) {
+    public User findTokenOwner(@NotNull Repository<User> userRepository, @NotNull byte[] token) {
         try (Jedis jedis = jedisPool.getResource()) {
             byte[] id = jedis.get(token);
             if (id != null) {
-                try (UserRepository userRepository = server.getRepositoryService().createUserRepository()) {
-                    return userRepository.findById(Ints.fromByteArray(id));
-                }
+                return userRepository.findById(Ints.fromByteArray(id));
             }
         }
         return null;

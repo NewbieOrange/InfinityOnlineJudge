@@ -6,6 +6,7 @@ import xyz.chengzi.ooad.entity.Problem
 import xyz.chengzi.ooad.entity.Submission
 import xyz.chengzi.ooad.entity.User
 import xyz.chengzi.ooad.repository.JpaRepository
+import xyz.chengzi.ooad.repository.Repository
 import xyz.chengzi.ooad.repository.user.UserRepository
 import xyz.chengzi.ooad.server.ApplicationServer
 
@@ -19,9 +20,9 @@ abstract class AbstractController(server: ApplicationServer) {
      * @param ctx the context.
      * @return the caller user, null if the caller is not authorized.
      */
-    fun getCallerUser(ctx: Context): User? {
+    fun getCallerUser(userRepository: Repository<User>, ctx: Context): User? {
         val token = ctx.cookie("token")
-        return if (token == null) null else sessionService.findTokenOwner(token.toByteArray())
+        return if (token == null) null else sessionService.findTokenOwner(userRepository, token.toByteArray())
     }
 
     fun checkPermission(user: User, permission: String): Boolean {

@@ -16,7 +16,7 @@ import xyz.chengzi.ooad.server.ApplicationServer
 class UserController(server: ApplicationServer) : AbstractController(server) {
     fun create(ctx: Context) {
         val userRepository = repositoryService.createUserRepository()
-        val caller = getCallerUser(ctx) ?: throw UnauthorizedResponse()
+        val caller = getCallerUser(userRepository, ctx) ?: throw UnauthorizedResponse()
         if (!checkPermission(caller, "users.create")) {
             throw UnauthorizedResponse()
         }
@@ -72,7 +72,8 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
     }
 
     fun getCurrentUser(ctx: Context) {
-        val caller = getCallerUser(ctx) ?: throw UnauthorizedResponse()
+        val userRepository = repositoryService.createUserRepository()
+        val caller = userRepository.use { getCallerUser(it, ctx) } ?: throw UnauthorizedResponse()
         ctx.json(UserResponse(caller))
     }
 }

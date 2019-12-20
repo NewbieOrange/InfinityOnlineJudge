@@ -18,7 +18,7 @@ public class Problem {
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
     private List<Submission> submissions;
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL)
-    @OrderBy(value = "timeUsage, memoryUsage")
+    @OrderBy(value = "timeUsage desc, memoryUsage desc")
     private Map<User, Submission> rankList;
     @OneToOne
     private Discussion discussion;
