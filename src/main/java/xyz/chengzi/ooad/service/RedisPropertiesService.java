@@ -29,6 +29,13 @@ public class RedisPropertiesService implements PropertiesService {
     }
 
     @Override
+    public void removeProperty(@Nonnull String key) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.del(key);
+        }
+    }
+
+    @Override
     public void loadProperties() {
     }
 

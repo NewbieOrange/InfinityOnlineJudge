@@ -20,7 +20,11 @@ class RepositoryService(persistenceUnitName: String) {
         return createRepository()
     }
 
-    fun createDiscussionRepository(): JpaRepository<Discussion> {
+    fun createDiscussionThreadRepository(): JpaRepository<DiscussionThread> {
+        return createRepository()
+    }
+
+    fun createDiscussionCommentRepository(): JpaRepository<DiscussionComment> {
         return createRepository()
     }
 

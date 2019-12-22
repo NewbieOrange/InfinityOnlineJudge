@@ -5,24 +5,21 @@ import io.javalin.http.NotFoundResponse
 import org.json.JSONObject
 import xyz.chengzi.ooad.dto.ProblemResponse
 import xyz.chengzi.ooad.dto.SubmissionResponse
-import xyz.chengzi.ooad.embeddable.SubmissionStatus
-import xyz.chengzi.ooad.entity.Discussion
+import xyz.chengzi.ooad.entity.DiscussionComment
+import xyz.chengzi.ooad.entity.DiscussionThread
 import xyz.chengzi.ooad.entity.Problem
-import xyz.chengzi.ooad.repository.EmptyGroups
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
-import xyz.chengzi.ooad.repository.submission.SubmissionByTimeMemoryOrder
-import xyz.chengzi.ooad.repository.submission.SubmissionFromProblemSpecification
-import xyz.chengzi.ooad.repository.submission.SubmissionStatusSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
+import java.util.*
 import java.util.stream.Collectors
 
 class ProblemController(server: ApplicationServer) : AbstractController(server) {
     fun create(ctx: Context) {
         val problemRepository = repositoryService.createProblemRepository()
-        val discussionRepository = repositoryService.createDiscussionRepository()
+        val threadRepository = repositoryService.createDiscussionThreadRepository()
 
         val requestBody = JSONObject(ctx.body())
         val item = Problem()
@@ -35,10 +32,11 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         item.memoryLimit = requestBody.getInt("memoryLimit")
         item.acceptedAmount = 0
         item.submissionAmount = 0
-        discussionRepository.use {
-            val discussion = Discussion()
+        threadRepository.use {
+            val discussion = DiscussionThread()
+            discussion.timestamp = Date()
             it.add(discussion)
-            item.discussion = discussion
+            item.discussionThread = discussion
         }
         problemRepository.use {
             it.add(item)
@@ -88,7 +86,6 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
     fun listSubmissionRank(ctx: Context) {
         val problemRepository = repositoryService.createProblemRepository()
         val id = ctx.pathParam("id", Int::class.java).get()
-        val since = ctx.queryParam("since", "0")!!.toInt()
 
         problemRepository.use { problemRepo ->
             val problem = problemRepo.findById(id)!!

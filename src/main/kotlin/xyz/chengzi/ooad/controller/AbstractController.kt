@@ -1,18 +1,14 @@
 package xyz.chengzi.ooad.controller
 
 import io.javalin.http.Context
-import xyz.chengzi.ooad.entity.Contest
-import xyz.chengzi.ooad.entity.Problem
-import xyz.chengzi.ooad.entity.Submission
 import xyz.chengzi.ooad.entity.User
-import xyz.chengzi.ooad.repository.JpaRepository
 import xyz.chengzi.ooad.repository.Repository
-import xyz.chengzi.ooad.repository.user.UserRepository
 import xyz.chengzi.ooad.server.ApplicationServer
 
 abstract class AbstractController(server: ApplicationServer) {
-    protected val sessionService = server.sessionService!!
     protected val repositoryService = server.repositoryService!!
+    protected val sessionService = server.sessionService!!
+    protected val propertiesService = server.propertiesService!!
 
     /**
      * Get the caller user of the ctx, null if the caller is not authorized.

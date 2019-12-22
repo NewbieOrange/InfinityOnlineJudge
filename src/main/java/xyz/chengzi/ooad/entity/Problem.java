@@ -21,7 +21,7 @@ public class Problem {
     @OrderBy(value = "timeUsage desc, memoryUsage desc")
     private Map<User, Submission> rankList;
     @OneToOne
-    private Discussion discussion;
+    private DiscussionThread discussionThread;
     private String type;
 
     private Boolean special;
@@ -74,12 +74,12 @@ public class Problem {
         this.rankList = rankList;
     }
 
-    public Discussion getDiscussion() {
-        return discussion;
+    public DiscussionThread getDiscussionThread() {
+        return discussionThread;
     }
 
-    public void setDiscussion(Discussion discussion) {
-        this.discussion = discussion;
+    public void setDiscussionThread(DiscussionThread discussionThread) {
+        this.discussionThread = discussionThread;
     }
 
     public String getType() {

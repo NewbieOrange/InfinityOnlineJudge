@@ -2,9 +2,7 @@ package xyz.chengzi.ooad.service
 
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
-import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
-import io.javalin.http.Handler
 import xyz.chengzi.ooad.controller.*
 import xyz.chengzi.ooad.server.ApplicationServer
 
@@ -15,6 +13,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
     private val submissionController = SubmissionController(server)
     private val userController = UserController(server)
     private val sessionController = SessionController(server)
+    private val propertiesController = PropertiesController(server)
 
     private val app = Javalin.create { config ->
         config.enableCorsForAllOrigins()
@@ -23,6 +22,14 @@ class RestService(server: ApplicationServer, private val port: Int) {
             path("contests") {
                 get(contestController::listAll)
                 post(contestController::create)
+            }
+            path("discussions") {
+                get(discussionController::listThreads)
+                post(discussionController::createThread)
+                path(":id") {
+                    get(discussionController::listAllInThread)
+                    post(discussionController::createComment)
+                }
             }
             path("problems") {
                 get(problemController::listAll)
@@ -33,8 +40,8 @@ class RestService(server: ApplicationServer, private val port: Int) {
                     delete(problemController::remove)
                     get("ranklist", problemController::listSubmissionRank)
                     path("discussions") {
-                        get(discussionController::listAll)
-                        post(discussionController::create)
+                        get(discussionController::listAllInProblem)
+                        post(discussionController::createInProblem)
                     }
                     path("files") {
                         get(problemController::listFiles)
@@ -72,6 +79,11 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 post(sessionController::login)
                 delete(sessionController::logout)
             }
+            path("properties") {
+                get(propertiesController::get)
+                post(propertiesController::set)
+                delete(propertiesController::remove)
+            }
         }
     }
 
@@ -79,6 +91,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
         when (method.toLowerCase()) {
             "get" -> app.get(path, handler)
             "post" -> app.post(path, handler)
+            "put" -> app.put(path, handler)
             "patch" -> app.patch(path, handler)
             "delete" -> app.delete(path, handler)
         }

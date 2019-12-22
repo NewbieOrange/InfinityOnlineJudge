@@ -59,6 +59,13 @@ public interface PropertiesService {
     void setProperty(@Nonnull String key, @Nonnull Object value);
 
     /**
+     * Remove the key-value set of the given key.
+     *
+     * @param key the key.
+     */
+    void removeProperty(@Nonnull String key);
+
+    /**
      * Load the properties from the datasource.
      */
     void loadProperties();

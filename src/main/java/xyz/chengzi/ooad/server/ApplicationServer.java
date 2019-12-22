@@ -2,10 +2,7 @@ package xyz.chengzi.ooad.server;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import xyz.chengzi.ooad.service.RepositoryService;
-import xyz.chengzi.ooad.service.RestService;
-import xyz.chengzi.ooad.service.SessionService;
-import xyz.chengzi.ooad.service.RedisSessionService;
+import xyz.chengzi.ooad.service.*;
 import xyz.chengzi.ooad.util.JavascriptEngine;
 
 import java.io.IOException;
@@ -16,6 +13,7 @@ import java.nio.file.Paths;
 public class ApplicationServer {
     private final RepositoryService repositoryService;
     private final SessionService sessionService;
+    private final PropertiesService propertiesService;
     private final RestService restService;
     private final JedisPool jedisPool;
     private final JavascriptEngine javascriptEngine;
@@ -23,7 +21,8 @@ public class ApplicationServer {
     public ApplicationServer(int port) {
         jedisPool = new JedisPool(new JedisPoolConfig(), "10.20.16.7", 6379, 1000);
         repositoryService = new RepositoryService("hibernate.jpa");
-        sessionService = new RedisSessionService(this, jedisPool);
+        sessionService = new RedisSessionService(jedisPool);
+        propertiesService = new RedisPropertiesService(jedisPool);
         restService = new RestService(this, port);
         javascriptEngine = new JavascriptEngine(this);
 
@@ -63,6 +62,10 @@ public class ApplicationServer {
 
     public SessionService getSessionService() {
         return sessionService;
+    }
+
+    public PropertiesService getPropertiesService() {
+        return propertiesService;
     }
 
     public RestService getRestService() {
