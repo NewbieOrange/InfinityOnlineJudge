@@ -62,7 +62,6 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
     }
 
     private fun submissionCallback(str: String) {
-        println("Received from MQ: $str")
         val problemRepository = repositoryService.createProblemRepository()
         val submissionRepository = repositoryService.createSubmissionRepository()
         val responseList = MapperUtil.readValue(str, JudgeResponseList::class.java)

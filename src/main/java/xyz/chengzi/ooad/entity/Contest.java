@@ -2,6 +2,7 @@ package xyz.chengzi.ooad.entity;
 
 import xyz.chengzi.ooad.embeddable.ContestProblem;
 import xyz.chengzi.ooad.embeddable.ContestStatus;
+import xyz.chengzi.ooad.embeddable.Visibility;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +20,8 @@ public class Contest {
     private List<ContestProblem> problems;
     private Date startDate, endDate;
     private ContestStatus status;
+    private Visibility visibility;
+    private String mode;
 
     public Integer getId() {
         return id;
@@ -66,5 +69,21 @@ public class Contest {
 
     public void setStatus(ContestStatus status) {
         this.status = status;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 }

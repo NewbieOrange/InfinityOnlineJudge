@@ -5,7 +5,7 @@ import xyz.chengzi.ooad.entity.User
 import xyz.chengzi.ooad.repository.Repository
 import xyz.chengzi.ooad.server.ApplicationServer
 
-abstract class AbstractController(server: ApplicationServer) {
+abstract class AbstractController(protected val server: ApplicationServer) {
     protected val repositoryService = server.repositoryService!!
     protected val sessionService = server.sessionService!!
     protected val propertiesService = server.propertiesService!!

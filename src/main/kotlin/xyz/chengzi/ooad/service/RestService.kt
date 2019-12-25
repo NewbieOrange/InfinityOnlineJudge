@@ -7,13 +7,13 @@ import xyz.chengzi.ooad.controller.*
 import xyz.chengzi.ooad.server.ApplicationServer
 
 class RestService(server: ApplicationServer, private val port: Int) {
-    private val contestController = ContestController(server)
-    private val problemController = ProblemController(server)
-    private val discussionController = DiscussionController(server)
-    private val submissionController = SubmissionController(server)
-    private val userController = UserController(server)
-    private val sessionController = SessionController(server)
-    private val propertiesController = PropertiesController(server)
+    val contestController = ContestController(server)
+    val problemController = ProblemController(server)
+    val discussionController = DiscussionController(server)
+    val submissionController = SubmissionController(server)
+    val userController = UserController(server)
+    val sessionController = SessionController(server)
+    val propertiesController = PropertiesController(server)
 
     private val app = Javalin.create { config ->
         config.enableCorsForAllOrigins()
@@ -80,9 +80,11 @@ class RestService(server: ApplicationServer, private val port: Int) {
                 delete(sessionController::logout)
             }
             path("properties") {
-                get(propertiesController::get)
-                post(propertiesController::set)
-                delete(propertiesController::remove)
+                path(":key") {
+                    get(propertiesController::get)
+                    post(propertiesController::set)
+                    delete(propertiesController::remove)
+                }
             }
         }
     }

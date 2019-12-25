@@ -1,5 +1,7 @@
 package xyz.chengzi.ooad.entity;
 
+import xyz.chengzi.ooad.embeddable.Visibility;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +24,8 @@ public class Problem {
     private Map<User, Submission> rankList;
     @OneToOne
     private DiscussionThread discussionThread;
+    private Visibility visibility;
     private String type;
-
     private Boolean special;
     private Integer timeLimit;
     private Integer memoryLimit;
@@ -80,6 +82,14 @@ public class Problem {
 
     public void setDiscussionThread(DiscussionThread discussionThread) {
         this.discussionThread = discussionThread;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
     public String getType() {

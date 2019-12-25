@@ -5,6 +5,7 @@ import io.javalin.http.NotFoundResponse
 import io.javalin.http.UnauthorizedResponse
 import org.json.JSONArray
 import org.json.JSONObject
+import xyz.chengzi.ooad.dto.UpdateUserRequest
 import xyz.chengzi.ooad.dto.UserResponse
 import xyz.chengzi.ooad.entity.User
 import xyz.chengzi.ooad.repository.Specification
@@ -24,6 +25,19 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
         val user = User(body.getString("username"), sessionService.hashPassword(body.getString("password")))
         userRepository.use {
             it.add(user)
+        }
+    }
+
+    fun update(ctx: Context) {
+        val userRepository = repositoryService.createUserRepository()
+        val caller = getCallerUser(userRepository, ctx) ?: throw UnauthorizedResponse()
+        val request = ctx.bodyAsClass(UpdateUserRequest::class.java)
+        caller.displayName = request.displayName
+        caller.gender = request.gender
+        caller.email = request.email
+        caller.biography = request.biography
+        userRepository.use {
+            it.update(caller)
         }
     }
 
