@@ -7,19 +7,27 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 public class JavascriptEngine {
+    private final ApplicationServer server;
+    private final ScriptEngineManager manager;
     private ScriptEngine engine;
 
     public JavascriptEngine(ApplicationServer server) {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("javascript");
-        engine.put("server", server);
+        this.server = server;
+        this.manager = new ScriptEngineManager();
+        reset();
     }
 
-    public void eval(String script) {
+    public Object eval(String script) {
         try {
-            engine.eval(script);
+            return engine.eval(script);
         } catch (ScriptException e) {
             e.printStackTrace();
+            return null;
         }
+    }
+
+    public void reset() {
+        engine = manager.getEngineByName("javascript");
+        engine.put("server", server);
     }
 }

@@ -7,8 +7,9 @@ import xyz.chengzi.ooad.util.JavascriptEngine;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicationServer {
     private final RepositoryService repositoryService;
@@ -16,7 +17,10 @@ public class ApplicationServer {
     private final PropertiesService propertiesService;
     private final RestService restService;
     private final JedisPool jedisPool;
+
+    private final TerminalThread terminalThread;
     private final JavascriptEngine javascriptEngine;
+    private final List<Object> loadedModules;
 
     public ApplicationServer(int port) {
         jedisPool = new JedisPool(new JedisPoolConfig(), "10.20.16.7", 6379, 1000);
@@ -24,7 +28,11 @@ public class ApplicationServer {
         sessionService = new RedisSessionService(jedisPool);
         propertiesService = new RedisPropertiesService(jedisPool);
         restService = new RestService(this, port);
+
+        terminalThread = new TerminalThread(this);
+        terminalThread.setDaemon(true);
         javascriptEngine = new JavascriptEngine(this);
+        loadedModules = new ArrayList<>();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
@@ -34,8 +42,9 @@ public class ApplicationServer {
             Files.list(Paths.get("./modules")).filter(Files::isRegularFile).forEach((p) -> {
                 try {
                     String script = Files.readString(p);
-                    javascriptEngine.eval(script);
-                } catch (IOException e) {
+                    Object plugin = javascriptEngine.eval(script);
+                    loadedModules.add(plugin);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
@@ -44,9 +53,15 @@ public class ApplicationServer {
         }
     }
 
+    public void unloadModules() {
+        javascriptEngine.reset();
+        loadedModules.clear();
+    }
+
     public void start() {
         loadModules();
         restService.start();
+        terminalThread.start();
     }
 
     public void stop() {

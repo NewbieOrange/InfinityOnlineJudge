@@ -7,6 +7,8 @@ import xyz.chengzi.ooad.controller.*
 import xyz.chengzi.ooad.server.ApplicationServer
 
 class RestService(server: ApplicationServer, private val port: Int) {
+    private val dynamicRoutes = HashMap<String, (Context) -> Unit>()
+
     val contestController = ContestController(server)
     val problemController = ProblemController(server)
     val discussionController = DiscussionController(server)
@@ -91,13 +93,20 @@ class RestService(server: ApplicationServer, private val port: Int) {
     }
 
     fun register(method: String, path: String, handler: (Context) -> Unit) {
-        when (method.toLowerCase()) {
-            "get" -> app.get(path, handler)
-            "post" -> app.post(path, handler)
-            "put" -> app.put(path, handler)
-            "patch" -> app.patch(path, handler)
-            "delete" -> app.delete(path, handler)
+        val method = method.toLowerCase()
+        if (dynamicRoutes["$method@$path"] == null) {
+            val dynamicHandler = fun(ctx: Context) {
+                dynamicRoutes["$method@$path"]?.let { it(ctx) }
+            }
+            when (method) {
+                "get" -> app.get(path, dynamicHandler)
+                "post" -> app.post(path, dynamicHandler)
+                "put" -> app.put(path, dynamicHandler)
+                "patch" -> app.patch(path, dynamicHandler)
+                "delete" -> app.delete(path, dynamicHandler)
+            }
         }
+        dynamicRoutes["$method@$path"] = handler
     }
 
     fun start() {

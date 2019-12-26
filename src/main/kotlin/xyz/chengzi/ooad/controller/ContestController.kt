@@ -35,6 +35,7 @@ class ContestController(server: ApplicationServer) : AbstractController(server) 
     private val routeModeHandlerMap = HashMap<String, HashMap<String, (Context) -> Unit>>()
 
     fun registerMode(method: String, mode: String, path: String, handler: (Context) -> Unit) {
+        val method = method.toLowerCase()
         val route = "$method%$path"
         if (routeModeHandlerMap[route] == null) {
             routeModeHandlerMap[route] = HashMap()
