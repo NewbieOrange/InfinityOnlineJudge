@@ -2,6 +2,7 @@ package xyz.chengzi.ooad.service;
 
 import com.rabbitmq.client.*;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
@@ -45,6 +46,14 @@ public class RabbitMQService {
             });
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void close() {
+        try {
+            connection.close();
+        } catch (IOException e) {
+            // ignored
         }
     }
 }

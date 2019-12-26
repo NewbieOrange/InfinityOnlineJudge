@@ -19,7 +19,6 @@ import xyz.chengzi.ooad.repository.entity.EntityIdDescOrders
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.repository.submission.SubmissionByUserSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
-import xyz.chengzi.ooad.service.RabbitMQService
 import xyz.chengzi.ooad.util.MapperUtil
 import java.nio.file.Files
 import java.nio.file.Path
@@ -28,7 +27,7 @@ import kotlin.collections.ArrayList
 
 class SubmissionController(server: ApplicationServer) : AbstractController(server) {
     private val extensionNames = ImmutableMap.of("gcc", ".c", "g++", ".cpp", "java", ".java", "python", ".py", "sql", ".sql")
-    private val rabbitMQService = RabbitMQService()
+    private val rabbitMQService = server.messageQueueService
 
     fun create(ctx: Context) {
         val userRepository = repositoryService.createUserRepository()

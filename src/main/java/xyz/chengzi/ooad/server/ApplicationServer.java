@@ -16,17 +16,20 @@ public class ApplicationServer {
     private final SessionService sessionService;
     private final PropertiesService propertiesService;
     private final RestService restService;
-    private final JedisPool jedisPool;
+    private final RabbitMQService messageQueueService;
 
+    private final JedisPool jedisPool;
     private final TerminalThread terminalThread;
     private final JavascriptEngine javascriptEngine;
     private final List<Object> loadedModules;
 
     public ApplicationServer(int port) {
         jedisPool = new JedisPool(new JedisPoolConfig(), "10.20.16.7", 6379, 1000);
+
         repositoryService = new RepositoryService("hibernate.jpa");
         sessionService = new RedisSessionService(jedisPool);
         propertiesService = new RedisPropertiesService(jedisPool);
+        messageQueueService = new RabbitMQService();
         restService = new RestService(this, port);
 
         terminalThread = new TerminalThread(this);
@@ -68,6 +71,7 @@ public class ApplicationServer {
         repositoryService.close();
         sessionService.close();
         restService.close();
+        messageQueueService.close();
         jedisPool.close();
     }
 
@@ -81,6 +85,10 @@ public class ApplicationServer {
 
     public PropertiesService getPropertiesService() {
         return propertiesService;
+    }
+
+    public RabbitMQService getMessageQueueService() {
+        return messageQueueService;
     }
 
     public RestService getRestService() {

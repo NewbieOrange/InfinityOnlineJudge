@@ -1,6 +1,5 @@
 package xyz.chengzi.ooad.entity;
 
-import xyz.chengzi.ooad.embeddable.ContestProblem;
 import xyz.chengzi.ooad.embeddable.ContestStatus;
 import xyz.chengzi.ooad.embeddable.Visibility;
 
@@ -16,8 +15,10 @@ public class Contest {
     private Integer id;
     private String title;
     private String description;
-    @ElementCollection
+    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL)
     private List<ContestProblem> problems;
+    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL)
+    private List<ContestSubmission> submissions;
     private Date startDate, endDate;
     private ContestStatus status;
     private Visibility visibility;
@@ -45,6 +46,10 @@ public class Contest {
 
     public List<ContestProblem> getProblems() {
         return problems;
+    }
+
+    public List<ContestSubmission> getSubmissions() {
+        return submissions;
     }
 
     public Date getStartDate() {
