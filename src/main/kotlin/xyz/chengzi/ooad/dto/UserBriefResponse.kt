@@ -4,5 +4,5 @@ import xyz.chengzi.ooad.entity.User
 
 class UserBriefResponse(user : User) {
     val id = user.id
-    val displayName = user.displayName ?: user.username
+    val displayName = user.displayName.takeIf { it.isNotEmpty() } ?: user.username
 }

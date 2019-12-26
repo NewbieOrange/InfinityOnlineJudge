@@ -74,6 +74,7 @@ class RestService(server: ApplicationServer, private val port: Int) {
             }
             path("user") {
                 get(userController::getCurrentUser)
+                patch(userController::update)
             }
             path("session") {
                 post(sessionController::login)
