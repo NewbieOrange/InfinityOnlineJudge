@@ -27,7 +27,7 @@ class ContestController(server: ApplicationServer) : AbstractController(server) 
         val contestRepository = repositoryService.createContestRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
         contestRepository.use {
-            val contests = it.findAll(SinceIdSpecification(since), 10)
+            val contests = it.findAll(SinceIdSpecification(since))
             ctx.json(contests)
         }
     }

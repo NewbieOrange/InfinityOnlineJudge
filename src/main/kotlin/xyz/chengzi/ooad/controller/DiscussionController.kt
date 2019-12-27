@@ -8,6 +8,8 @@ import xyz.chengzi.ooad.dto.DiscussionThreadResponse
 import xyz.chengzi.ooad.entity.DiscussionComment
 import xyz.chengzi.ooad.entity.DiscussionThread
 import xyz.chengzi.ooad.repository.discussionthread.DiscussionThreadTitleNotNullSpecification
+import xyz.chengzi.ooad.repository.entity.EntityIdAscOrders
+import xyz.chengzi.ooad.repository.entity.EntityIdDescOrders
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import java.util.*
@@ -114,7 +116,7 @@ class DiscussionController(server: ApplicationServer) : AbstractController(serve
         val threadRepository = repositoryService.createDiscussionThreadRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
         threadRepository.use { repo ->
-            val items = repo.findAll(DiscussionThreadTitleNotNullSpecification().and(SinceIdSpecification(since)), 10)
+            val items = repo.findAll(DiscussionThreadTitleNotNullSpecification().and(SinceIdSpecification(since)), EntityIdAscOrders(), Integer.MAX_VALUE)
             ctx.json(items.map { DiscussionThreadBriefResponse(it) }.toList())
         }
     }

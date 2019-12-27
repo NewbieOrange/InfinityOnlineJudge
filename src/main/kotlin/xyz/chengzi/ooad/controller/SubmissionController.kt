@@ -129,7 +129,7 @@ class SubmissionController(server: ApplicationServer) : AbstractController(serve
             }
         }
         submissionRepository.use { repo ->
-            val items = repo.findAll(submitByUserSpecification.and(SinceIdSpecification(since)), order, 10)
+            val items = repo.findAll(submitByUserSpecification.and(SinceIdSpecification(since)), order, Integer.MAX_VALUE)
             ctx.json(items.map { SubmissionResponse(it) }.toList())
         }
     }

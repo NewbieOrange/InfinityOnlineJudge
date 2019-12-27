@@ -9,6 +9,8 @@ import xyz.chengzi.ooad.dto.UpdateUserRequest
 import xyz.chengzi.ooad.dto.UserResponse
 import xyz.chengzi.ooad.entity.User
 import xyz.chengzi.ooad.repository.Specification
+import xyz.chengzi.ooad.repository.entity.EntityIdAscOrders
+import xyz.chengzi.ooad.repository.entity.EntityIdDescOrders
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.repository.user.PermissionSpecification
 import xyz.chengzi.ooad.repository.user.UsernameSpecification
@@ -63,7 +65,7 @@ class UserController(server: ApplicationServer) : AbstractController(server) {
             specification = specification.and(PermissionSpecification(permission))
         }
         userRepository.use { repo ->
-            ctx.json(repo.findAll(specification, 10).map { UserResponse(it) }.toList())
+            ctx.json(repo.findAll(specification, EntityIdAscOrders(), Integer.MAX_VALUE).map { UserResponse(it) }.toList())
         }
     }
 

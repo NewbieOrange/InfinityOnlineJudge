@@ -8,6 +8,8 @@ import xyz.chengzi.ooad.dto.SubmissionResponse
 import xyz.chengzi.ooad.entity.DiscussionComment
 import xyz.chengzi.ooad.entity.DiscussionThread
 import xyz.chengzi.ooad.entity.Problem
+import xyz.chengzi.ooad.repository.entity.EntityIdAscOrders
+import xyz.chengzi.ooad.repository.entity.EntityIdDescOrders
 import xyz.chengzi.ooad.repository.entity.SinceIdSpecification
 import xyz.chengzi.ooad.server.ApplicationServer
 import java.nio.file.Files
@@ -70,7 +72,7 @@ class ProblemController(server: ApplicationServer) : AbstractController(server) 
         val problemRepository = repositoryService.createProblemRepository()
         val since = ctx.queryParam("since", "0")!!.toInt()
         problemRepository.use { repo ->
-            val items = repo.findAll(SinceIdSpecification(since), 10)
+            val items = repo.findAll(SinceIdSpecification(since), EntityIdAscOrders(), Integer.MAX_VALUE)
             ctx.json(items.map { ProblemResponse(it) }.toList())
         }
     }
